@@ -190,6 +190,13 @@ class UserSerializer(serializers.ModelSerializer):
 
 
 class MyDonationSerializer(serializers.ModelSerializer):
+    def update(self, instance, validated_data):
+        validated_data.pop('is_confirmed', None)
+        for key, value in validated_data.items():
+            setattr(instance, key, value)
+        instance.save()
+        return instance
+
     class Meta:
         model = Donation
         fields = '__all__'  # This will include all fields from the Donation model

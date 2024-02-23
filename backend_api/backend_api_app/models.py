@@ -191,7 +191,8 @@ class Donation(models.Model):
     is_confirmed = models.BooleanField(default=False)
     date = models.DateTimeField(auto_now_add=True)
     blood_station_id = models.IntegerField()
-    donation_type = models.CharField(max_length=20, choices=DONATION_TYPES_CHOICES, null=False, blank=False)
+    donation_type = models.CharField(max_length=20, choices=DONATION_TYPES_CHOICES, null=False, blank=False,
+                                     default='blood')
     is_free = models.BooleanField(default=True)
 
 
@@ -199,7 +200,8 @@ class PlanDonation(models.Model):
     user = models.ForeignKey(User, on_delete=models.CASCADE)
     date = models.DateTimeField()
     blood_station_id = models.IntegerField()
-    donation_type = models.CharField(max_length=20, choices=DONATION_TYPES_CHOICES),
+    donation_type = models.CharField(max_length=20, choices=DONATION_TYPES_CHOICES, null=False,
+                                     blank=False, default='blood'),
     is_free = models.BooleanField(default=True)
 
 

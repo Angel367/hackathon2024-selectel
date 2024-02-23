@@ -122,12 +122,15 @@ class MainUserAPIView(APIView):
 
     def get(self, request):
         user = request.user
-        data = {
-            "user": UserSerializer(user).data,
-            "donor_card": DonorCardSerializer(user).data,
-            "donations": MyDonationSerializer(Donation.objects.filter(user=user)).data,
-            "plan_donations": UserPlanDonationSerializer(PlanDonation.objects.filter(user=user)).data
-        }
+        data = UserSerializer(user).data
+        donor_card = DonorCardSerializer(user).data
+        donor_card.pop('token')
+        data.update({
+            "donor_card": donor_card,
+            "donations": MyDonationSerializer(Donation.objects.filter(user=user), many=True).data,
+            "plan_donations": UserPlanDonationSerializer(PlanDonation.objects.filter(user=user), many=True).data
+        })
+
         return Response(data, status=status.HTTP_200_OK)
 
 
