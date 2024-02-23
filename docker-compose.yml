@@ -26,7 +26,7 @@ services:
     image: node:latest
     working_dir: /donor-frontend
     volumes:
-      - .:/donor-frontend
+      - /donor-frontend:/donor-frontend
     command: npm run dev
     ports:
       - "3000:3000" # порт Vite
