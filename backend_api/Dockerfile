@@ -18,6 +18,7 @@ COPY backend_api/manage.py /code/
 
 # Run migrations
 RUN python manage.py makemigrations
+RUN python manage.py makemigrations backend_api_app
 RUN python manage.py migrate
 
 # Specify the command to run on container start
