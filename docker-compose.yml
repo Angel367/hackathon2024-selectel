@@ -27,6 +27,6 @@ services:
     working_dir: /donor-frontend
     volumes:
       - ./donor-frontend:/donor-frontend
-    command: sh -c "npm install && npm run dev"
+    command: sh -c "npm install && npm run dev && --host"
     ports:
       - "5173:5173" # порт Vite
