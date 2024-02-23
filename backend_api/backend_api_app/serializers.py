@@ -2,9 +2,7 @@ import re
 
 from django.contrib.auth import authenticate
 from rest_framework import serializers
-
-from .models import User, Donation, PlanDonation
-from .backends import EmailPhoneAuthBackend
+from .models import Donation, PlanDonation
 from .models import User
 
 
@@ -109,6 +107,30 @@ class LoginSerializer(serializers.Serializer):
 
 
 
+class DonorCardSerializer(serializers.ModelSerializer):
+    token = serializers.CharField(max_length=255, read_only=True)
+    class Meta:
+        model = User
+        read_only_fields = ('token',)
+        fields = ['ready_to_donate_blood', 'ready_to_donate_granulocytes', 'ready_to_donate_platelets',
+                  'ready_to_donate_plasma', 'ready_to_donate_erythrocytes', 'kell_factor', 'blood_group', 'id']
+
+    def update(self, instance, validated_data):
+        for key, value in validated_data.items():
+            setattr(instance, key, value)
+        instance.save()
+        return instance
+
+
+
+class AllDataUserSerializer(serializers.ModelSerializer):
+
+    class Meta:
+        model = User
+        read_only_fields = ('token')
+        exclude = ('password',  'is_active', 'is_staff', 'created_at',
+                   'updated_at', 'is_email_verified', 'is_phone_verified')
+
 
 
 class UserSerializer(serializers.ModelSerializer):
@@ -137,7 +159,11 @@ class UserSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = User
-        fields = ['email', 'username', 'password', 'token', 'id', 'old_password', 'new_password', 'phone_number']
+        fields = ['email', 'username', 'password',
+                  'token', 'id', 'phone_number', 'first_name',
+                  'last_name', 'middle_name', 'birth_date',
+                  'is_email_verified', 'is_phone_verified',
+                  'about', 'old_password', 'new_password']
 
         # Параметр read_only_fields является альтернативой явному указанию поля
         # с помощью read_only = True, как мы это делали для пароля выше.
@@ -149,11 +175,7 @@ class UserSerializer(serializers.ModelSerializer):
 
 
     def update(self, instance, validated_data):
-        """ Выполняет обновление User. """
-        # В отличие от других полей, пароли не следует обрабатывать с помощью
-        # setattr. Django предоставляет функцию, которая обрабатывает пароли
-        # хешированием и 'солением'. Это означает, что нам нужно удалить поле
-        # пароля из словаря 'validated_data' перед его использованием далее.
+
         old_password = validated_data.pop('old_password', None)
         new_password = validated_data.pop('new_password', None)
         for key, value in validated_data.items():
