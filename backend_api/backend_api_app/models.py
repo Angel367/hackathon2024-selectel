@@ -189,7 +189,7 @@ class BonusFeedback(models.Model):
 class Donation(models.Model):
     user = models.ForeignKey(User, on_delete=models.CASCADE)
     is_confirmed = models.BooleanField(default=False)
-    date = models.DateTimeField(auto_now_add=True, null=False),
+    donation_date = models.DateTimeField()
     blood_station_id = models.IntegerField()
     donation_type = models.CharField(max_length=20, choices=DONATION_TYPES_CHOICES, null=False, blank=False,
                                      default='blood')
@@ -198,10 +198,9 @@ class Donation(models.Model):
 
 class PlanDonation(models.Model):
     user = models.ForeignKey(User, on_delete=models.CASCADE)
-    date = models.DateTimeField(auto_now_add=True)
+    donation_date = models.DateTimeField()
     blood_station_id = models.IntegerField()
-    donation_type = models.CharField(max_length=20, choices=DONATION_TYPES_CHOICES, null=False,
-                                     blank=False, default='blood'),
+    donation_type = models.CharField(max_length=20, default='blood',choices=DONATION_TYPES_CHOICES)
     is_free = models.BooleanField(default=True)
 
 
