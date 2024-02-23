@@ -144,6 +144,7 @@ class DonationSerializer(serializers.ModelSerializer):
         model = Donation
         fields = '__all__'  # This will include all fields from the Donation model
 
+
 class PlanDonationSerializer(serializers.ModelSerializer):
     class Meta:
         model = PlanDonation

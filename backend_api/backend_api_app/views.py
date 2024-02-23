@@ -1,4 +1,5 @@
 from rest_framework import status, viewsets, permissions
+from rest_framework.decorators import action
 from rest_framework.generics import RetrieveUpdateAPIView
 from rest_framework.permissions import AllowAny, IsAuthenticated
 from rest_framework.response import Response
@@ -30,6 +31,7 @@ class RegistrationAPIView(APIView):
 
         return Response(serializer.data, status=status.HTTP_201_CREATED)
 
+
 class LoginAPIView(APIView):
     permission_classes = (AllowAny,)
     renderer_classes = (UserJSONRenderer,)
@@ -45,6 +47,7 @@ class LoginAPIView(APIView):
         serializer.is_valid(raise_exception=True)
 
         return Response(serializer.data, status=status.HTTP_200_OK)
+
 
 class UserRetrieveUpdateAPIView(RetrieveUpdateAPIView):
     permission_classes = (IsAuthenticated,)
@@ -72,28 +75,57 @@ class UserRetrieveUpdateAPIView(RetrieveUpdateAPIView):
         return Response(serializer.data, status=status.HTTP_200_OK)
 
 
-class CreateDonationView(APIView):
+class DonationViewSet(viewsets.ViewSet):
     permission_classes = (IsAuthenticated,)  # Требуется авторизация через токен
 
-    def post(self, request):
-        user = request.user  # Получаем пользователя из запроса
+    def list(self, request):
+        donations = Donation.objects.filter(user=request.user)
+        serializer = DonationSerializer(donations, many=True)
+        return Response(serializer.data)
 
-        # Создаем сериализатор для сущности Donation, передавая данные из запроса
-        data = request.data.copy()  # Создаем копию данных запроса
-        data['user'] = user.id  # Добавляем текущего пользователя в данные запроса
+    def create(self, request):
+        user = request.user
+        data = request.data.copy()
+        data['user'] = user.id
         serializer = DonationSerializer(data=data)
 
         if serializer.is_valid():
-            # Устанавливаем пользователя для создаваемой сущности Donation
             serializer.save()
             return Response(serializer.data, status=status.HTTP_201_CREATED)
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
+    def retrieve(self, request, pk=None):  # Modify retrieve method to accept pk
+        try:
+            donation = Donation.objects.get(pk=pk)
+        except Donation.DoesNotExist:
+            return Response(status=status.HTTP_404_NOT_FOUND)
 
-class PlanDonationViewSet(viewsets.ModelViewSet):
-    queryset = PlanDonation.objects.all()
-    serializer_class = PlanDonationSerializer
-    permission_classes = [permissions.IsAuthenticated]  # Проверка авторизации пользователя
+        serializer = DonationSerializer(donation)
+        return Response(serializer.data)
 
-    def perform_create(self, serializer):
-        serializer.save(user_id=self.request.user)
+    def update(self, request, pk=None):  # Add update method to handle PUT requests
+        pk = request.data.get('id')
+        user = request.user
+        data = request.data.copy()
+        data['user'] = user.id
+        try:
+            donation = Donation.objects.get(pk=pk)
+        except Donation.DoesNotExist:
+            return Response(status=status.HTTP_404_NOT_FOUND)
+
+        serializer = DonationSerializer(donation, data=data)
+        if serializer.is_valid():
+            serializer.save()
+            return Response(serializer.data)
+        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
+    @action(detail=True, methods=['delete'])
+    def delete(self, request, pk=None):  # Modify delete method to accept pk
+        pk = request.data.get('id')
+        try:
+            donation = Donation.objects.get(pk=pk)
+        except Donation.DoesNotExist:
+            return Response(status=status.HTTP_404_NOT_FOUND, data={"Сущность не найдена"})
+
+        donation.delete()
+        return Response(status=status.HTTP_204_NO_CONTENT, data={"Успешно удалено"})

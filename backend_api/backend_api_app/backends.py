@@ -30,7 +30,10 @@ class JWTAuthentication(authentication.BaseAuthentication):
         # 'auth_header' должен быть массивом с двумя элементами:
         # 1) именем заголовка аутентификации (Token в нашем случае)
         # 2) сам JWT, по которому мы должны пройти аутентифкацию
-        auth_header = request.data.get('token', None).split()
+        try:
+            auth_header = request.data.get('token', None).split()
+        except Exception as e:
+            return None
         auth_header_prefix = self.authentication_header_prefix.lower()
 
         if not auth_header:
@@ -66,7 +69,6 @@ class JWTAuthentication(authentication.BaseAuthentication):
         вернуть пользователя и токен, иначе - сгенерировать исключение.
         """
         try:
-            print(token, settings.SECRET_KEY, jwt.decode(token, settings.SECRET_KEY, algorithms=['HS256']))
             payload = jwt.decode(token, settings.SECRET_KEY, algorithms=['HS256'])
         except Exception:
             msg = 'Ошибка аутентификации. Невозможно декодировать токеню'
