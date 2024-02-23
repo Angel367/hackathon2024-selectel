@@ -123,3 +123,48 @@ class DonationViewSet(viewsets.ViewSet):
 
         donation.delete()
         return Response(status=status.HTTP_204_NO_CONTENT, data={"Успешно удалено"})
+
+
+class PlanDonationViewSet(viewsets.ViewSet):
+    permission_classes = (IsAuthenticated,)  # Требуется авторизация через токен
+
+    def list(self, request):
+        donations = PlanDonation.objects.filter(user=request.user)
+        serializer = PlanDonationSerializer(donations, many=True)
+        return Response(serializer.data)
+
+    def create(self, request):
+        user = request.user
+        data = request.data.copy()
+        data['user'] = user.id
+        serializer = PlanDonationSerializer(data=data)
+
+        if serializer.is_valid():
+            serializer.save()
+            return Response(serializer.data, status=status.HTTP_201_CREATED)
+        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
+    def retrieve(self, request, pk=None):  # Modify retrieve method to accept pk
+        try:
+            donation = PlanDonation.objects.get(pk=pk)
+        except PlanDonation.DoesNotExist:
+            return Response(status=status.HTTP_404_NOT_FOUND)
+
+        serializer = PlanDonationSerializer(donation)
+        return Response(serializer.data)
+
+    def update(self, request, pk=None):  # Add update method to handle PUT requests
+        pk = request.data.get('id')
+        user = request.user
+        data = request.data.copy()
+        data['user'] = user.id
+        try:
+            donation = PlanDonation.objects.get(pk=pk)
+        except Donation.DoesNotExist:
+            return Response(status=status.HTTP_404_NOT_FOUND)
+
+        serializer = PlanDonationSerializer(donation, data=data)
+        if serializer.is_valid():
+            serializer.save()
+            return Response(serializer.data)
+        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)

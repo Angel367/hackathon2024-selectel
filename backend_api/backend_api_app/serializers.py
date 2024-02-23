@@ -181,7 +181,6 @@ class UserSerializer(serializers.ModelSerializer):
         return instance
 
 
-
 class DonationSerializer(serializers.ModelSerializer):
     class Meta:
         model = Donation
