@@ -6,10 +6,11 @@ from datetime import datetime, timedelta
 
 from django.conf import settings
 from django.contrib.auth.models import (
-	AbstractBaseUser, BaseUserManager, PermissionsMixin
+    AbstractBaseUser, BaseUserManager, PermissionsMixin
 )
 
 from django.db import models
+
 
 class UserManager(BaseUserManager):
     """
@@ -105,3 +106,10 @@ class User(AbstractBaseUser, PermissionsMixin):
 
         return token
 
+
+class Donation(models.Model):
+    user_id = models.ForeignKey(User, on_delete=models.CASCADE)
+    is_confirmed = models.BooleanField(default=False)
+    date = models.DateTimeField(auto_now_add=True)
+    blood_station_id = models.IntegerField()
+    # blood_type = models.CharField(max_length=255)
