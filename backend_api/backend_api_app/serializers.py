@@ -139,22 +139,39 @@ class UserSerializer(serializers.ModelSerializer):
 
     def update(self, instance, validated_data):
         """ Выполняет обновление User. """
-
         # В отличие от других полей, пароли не следует обрабатывать с помощью
         # setattr. Django предоставляет функцию, которая обрабатывает пароли
         # хешированием и 'солением'. Это означает, что нам нужно удалить поле
         # пароля из словаря 'validated_data' перед его использованием далее.
-        password = validated_data.pop('password', None)
-
+        old_password = validated_data.pop('old_password', None)
+        new_password = validated_data.pop('new_password', None)
         for key, value in validated_data.items():
+            if key == 'email':
+                if User.objects.filter(email=value).exists():
+                    raise serializers.ValidationError(
+                        'A user with this email already exists.'
+                    )
+            elif key == 'phone_number':
+                if User.objects.filter(phone_number=value).exists():
+                    raise serializers.ValidationError(
+                        'A user with this phone number already exists.'
+                    )
+
             # Для ключей, оставшихся в validated_data мы устанавливаем значения
             # в текущий экземпляр User по одному.
             setattr(instance, key, value)
 
-        if password is not None:
+        if old_password is None and new_password is not None:
             # 'set_password()' решает все вопросы, связанные с безопасностью
             # при обновлении пароля, потому нам не нужно беспокоиться об этом.
-            instance.set_password(password)
+            raise serializers.ValidationError(
+                'Old password is required to change password.'
+            )
+        if not instance.check_password(old_password):
+            raise serializers.ValidationError(
+                'Old password is incorrect.'
+            )
+        instance.set_password(new_password)
 
         # После того, как все было обновлено, мы должны сохранить наш экземпляр
         # User. Стоит отметить, что set_password() не сохраняет модель.
