@@ -1,1 +1,4 @@
 telebot
+django
+djangorestframework
+djangorestframework-simplejwt
