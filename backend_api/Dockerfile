@@ -16,13 +16,9 @@ RUN pip install --no-cache-dir -r requirements.txt
 COPY backend_api /code/
 COPY backend_api/manage.py /code/
 
-# Run makemigrations
-CMD ["python", "manage.py", "migrate"]
-CMD ["python", "manage.py", "makemigrations"]
-CMD ["python", "manage.py", "migrate"]
-CMD ["python", "manage.py", "makemigrations", "backend_api_app"]
-CMD ["python", "manage.py", "migrate"]
-CMD ["python", "manage.py", "migrate"]
-CMD ["python", "manage.py", "makemigrations"]
-CMD ["python", "manage.py", "migrate"]
+# Run migrations
+RUN python manage.py makemigrations
+RUN python manage.py migrate
+
+# Specify the command to run on container start
 CMD ["python", "manage.py", "runserver", "0.0.0.0:8000"]
