@@ -122,10 +122,22 @@ class UserSerializer(serializers.ModelSerializer):
         min_length=8,
         write_only=True
     )
+    old_password = serializers.CharField(
+        max_length=128,
+        min_length=8,
+        write_only=True,
+        required=False
+    )
+    new_password = serializers.CharField(
+        max_length=128,
+        min_length=8,
+        write_only=True,
+        required=False
+    )
 
     class Meta:
         model = User
-        fields = ('email', 'username', 'password', 'token', 'id')
+        fields = ['email', 'username', 'password', 'token', 'id', 'old_password', 'new_password', 'phone_number']
 
         # Параметр read_only_fields является альтернативой явному указанию поля
         # с помощью read_only = True, как мы это делали для пароля выше.
@@ -133,7 +145,8 @@ class UserSerializer(serializers.ModelSerializer):
         # состоит в том, что нам не нужно ничего указывать о поле. В поле
         # пароля требуются свойства min_length и max_length,
         # но это не относится к полю токена.
-        read_only_fields = ('token',)
+        read_only_fields = ['token']
+
 
     def update(self, instance, validated_data):
         """ Выполняет обновление User. """
@@ -146,14 +159,16 @@ class UserSerializer(serializers.ModelSerializer):
         for key, value in validated_data.items():
             if key == 'email':
                 if User.objects.filter(email=value).exists():
-                    raise serializers.ValidationError(
-                        'A user with this email already exists.'
-                    )
+                    if User.objects.filter(email=value).first().id != instance.id:
+                        raise serializers.ValidationError(
+                            'A user with this email already exists.'
+                        )
             elif key == 'phone_number':
                 if User.objects.filter(phone_number=value).exists():
-                    raise serializers.ValidationError(
-                        'A user with this phone number already exists.'
-                    )
+                    if User.objects.filter(phone_number=value).first().id != instance.id:
+                        raise serializers.ValidationError(
+                            'A user with this phone number already exists.'
+                        )
 
             # Для ключей, оставшихся в validated_data мы устанавливаем значения
             # в текущий экземпляр User по одному.
