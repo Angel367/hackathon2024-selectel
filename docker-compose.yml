@@ -21,3 +21,12 @@ services:
     depends_on:
       - django
     restart: always
+
+  vite:
+    image: node:latest
+    working_dir: /donor-frontend
+    volumes:
+      - .:/donor-frontend
+    command: npm run dev
+    ports:
+      - "3000:3000" # порт Vite
