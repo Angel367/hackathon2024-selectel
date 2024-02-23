@@ -10,7 +10,42 @@ from django.contrib.auth.models import (
 )
 
 from django.db import models
+GENDER_CHOICES = (
+    ('male', 'Мужской'),
+    ('female', 'Женский'),
+    ('unknown', 'Неизвестно')
+)
+BLOOD_GROUP_CHOICES = (
+    ('A', 'A'),
+    ('B', 'B'),
+    ('AB', 'AB'),
+    ('O', 'O'),
+    ('Unknown', 'Неизвестно')
+)
+RH_FACTOR_CHOICES = (
+    ('Positive', 'Положительный'),
+    ('Negative', 'Отрицательный'),
+    ('Unknown', 'Неизвестно')
+)
+KELL_FACTOR_CHOICES = (
+    ('Positive', 'Положительный'),
+    ('Negative', 'Отрицательный'),
+    ('Unknown', 'Неизвестно')
+)
 
+DONATION_TYPES_CHOICES = (
+    ('blood', 'Цельная кровь'),
+    ('plasma', 'Плазма'),
+    ('Platelets', 'Тромбоциты'),
+    ('Erythrocytes', 'Эритроциты'),
+    ('Granulocytes', 'Гранулоциты')
+)
+DONOR_STATUS_CHOICES = (
+    ('Legendary', 'Легендарный'),
+    ('Experienced', 'Опытный'),
+    ('Novice', 'Новичок'),
+    ('Unknown', 'Неизвестно')
+)
 
 class UserManager(BaseUserManager):
     """
@@ -55,26 +90,41 @@ class UserManager(BaseUserManager):
 class User(AbstractBaseUser, PermissionsMixin):
     username = models.CharField(db_index=True, max_length=255, unique=True)
     email = models.EmailField(db_index=True, null=True, unique=True)
-    phone_number = models.CharField(db_index=True,  max_length=10, null=True,unique=True)
+    phone_number = models.CharField(db_index=True, max_length=10, null=True, unique=True)
     is_active = models.BooleanField(default=True)
     is_staff = models.BooleanField(default=False)
     created_at = models.DateTimeField(auto_now_add=True)
-
+    city_id = models.IntegerField(null=True)
+    # image = models.ImageField(upload_to='users/', null=True)
     updated_at = models.DateTimeField(auto_now=True)
 
-    # Дополнительный поля, необходимые Django
-    # при указании кастомной модели пользователя.
+    first_name = models.CharField(max_length=25, null=True)
+    last_name = models.CharField(max_length=25, null=True)
+    middle_name = models.CharField(max_length=25, null=True)
+    birth_date = models.DateField(null=True)
+    gender = models.CharField(choices=GENDER_CHOICES, max_length=10, null=True)
+    about = models.TextField(null=True, blank=True, max_length=500)
 
-    # Свойство USERNAME_FIELD сообщает нам, какое поле мы будем использовать
-    # для входа в систему. В данном случае мы хотим использовать почту.
+    is_email_verified = models.BooleanField(default=False)
+    is_phone_verified = models.BooleanField(default=False)
+    kell_factor = models.CharField(choices=KELL_FACTOR_CHOICES, max_length=20)
+    blood_group = models.CharField(choices=BLOOD_GROUP_CHOICES, max_length=20)
+    rh_factor = models.CharField(choices=RH_FACTOR_CHOICES, max_length=20)
+    donor_status_name = models.CharField(max_length=20, null=True, choices=DONOR_STATUS_CHOICES)
+    has_donor_certificate = models.BooleanField(default=False)
+
+    ready_to_donate_blood = models.BooleanField(default=False)
+    ready_to_donate_plasma = models.BooleanField(default=False)
+    ready_to_donate_platelets = models.BooleanField(default=False)
+    ready_to_donate_erythrocytes = models.BooleanField(default=False)
+    ready_to_donate_granulocytes = models.BooleanField(default=False)
+
     USERNAME_FIELD = 'username'
     REQUIRED_FIELDS = ['']
 
     # Сообщает Django, что определенный выше класс UserManager
     # должен управлять объектами этого типа.
     objects = UserManager()
-
-
 
     def __str__(self):
         """ Строковое представление модели (отображается в консоли) """
@@ -116,14 +166,23 @@ class User(AbstractBaseUser, PermissionsMixin):
         return token
 
 
+class UserBonus(models.Model):
+    user = models.ForeignKey(User, on_delete=models.CASCADE)
+    bonus_id = models.IntegerField()
+    date_received = models.DateTimeField(auto_now_add=True)
+    date_expired = models.DateTimeField()
+
+
+class BonusFeedback(models.Model):
+    user_bonus = models.ForeignKey(UserBonus, on_delete=models.CASCADE)
+    feedback = models.TextField(max_length=500)
+    date = models.DateTimeField(auto_now_add=True)
+    mark = models.IntegerField()
+
+
+# Events get from api their
+
 class Donation(models.Model):
-    DONATION_TYPES_CHOICES = (
-        ('blood', 'Цельная кровь'),
-        ('plasma', 'Плазма'),
-        ('Platelets', 'Тромбоциты'),
-        ('Erythrocytes', 'Эритроциты'),
-        ('Granulocytes', 'Гранулоциты')
-    )
     user = models.ForeignKey(User, on_delete=models.CASCADE)
     is_confirmed = models.BooleanField(default=False)
     date = models.DateTimeField(auto_now_add=True)
@@ -133,15 +192,37 @@ class Donation(models.Model):
 
 
 class PlanDonation(models.Model):
-    DONATION_TYPES_CHOICES = (
-        ('blood', 'Цельная кровь'),
-        ('plasma', 'Плазма'),
-        ('Platelets', 'Тромбоциты'),
-        ('Erythrocytes', 'Эритроциты'),
-        ('Granulocytes', 'Гранулоциты')
-    )
     user = models.ForeignKey(User, on_delete=models.CASCADE)
     date = models.DateTimeField()
     blood_station_id = models.IntegerField()
     donation_type = models.CharField(max_length=20, choices=DONATION_TYPES_CHOICES),
     is_free = models.BooleanField(default=True)
+
+
+class Article(models.Model):
+    title = models.CharField(max_length=255)
+    text = models.TextField(max_length=1000)
+    date = models.DateTimeField(auto_now_add=True)
+    # image = models.ImageField(upload_to='articles/', null=True)
+    author_name = models.CharField(max_length=25)
+    author_surname = models.CharField(max_length=25)
+    is_active = models.BooleanField(default=True)
+
+
+class SpecialProject(models.Model):
+    title = models.CharField(max_length=255)
+    text = models.TextField(max_length=1000)
+    date_start = models.DateTimeField(auto_now_add=True)
+    date_end = models.DateTimeField(null=True)
+    link = models.CharField(max_length=255, null=True)
+    # image = models.ImageField(upload_to='special_projects/', null=True)
+    is_active = models.BooleanField(default=True)
+
+
+class UserEvent(models.Model):
+    user = models.ForeignKey(User, on_delete=models.CASCADE)
+    event_id = models.IntegerField()
+    date = models.DateTimeField(auto_now_add=True)
+
+
+

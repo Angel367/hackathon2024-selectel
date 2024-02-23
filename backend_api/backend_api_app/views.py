@@ -7,7 +7,8 @@ from rest_framework.views import APIView
 
 from .renderers import UserJSONRenderer
 from .serializers import (
-    LoginSerializer, RegistrationSerializer, UserSerializer, DonationSerializer, PlanDonationSerializer
+    LoginSerializer, RegistrationSerializer, UserSerializer, DonationSerializer, PlanDonationSerializer,
+    DonorCardSerializer
 )
 from .models import Donation, PlanDonation
 
@@ -32,6 +33,7 @@ class RegistrationAPIView(APIView):
 
 
 class LoginAPIView(APIView):
+    # for login
     permission_classes = (AllowAny,)
     renderer_classes = (UserJSONRenderer,)
     serializer_class = LoginSerializer
@@ -44,6 +46,7 @@ class LoginAPIView(APIView):
 
 
 class UserRetrieveUpdateAPIView(RetrieveUpdateAPIView):
+    # for account settings user (retrieve and update)
     permission_classes = (IsAuthenticated,)
     renderer_classes = (UserJSONRenderer,)
     serializer_class = UserSerializer
@@ -69,7 +72,45 @@ class UserRetrieveUpdateAPIView(RetrieveUpdateAPIView):
         return Response(serializer.data, status=status.HTTP_200_OK)
 
 
+class DonorCardAPIView(RetrieveUpdateAPIView):
+    # for donor card (retrieve and update)
+    permission_classes = (IsAuthenticated,)
+    renderer_classes = (UserJSONRenderer,)
+    serializer_class = DonorCardSerializer
+
+    def retrieve(self, request, *args, **kwargs):
+        serializer = self.serializer_class(request.user)
+        return Response(serializer.data, status=status.HTTP_200_OK)
+
+    def update(self, request, *args, **kwargs):
+        serializer_data = request.data.get('user', {})
+
+        serializer = self.serializer_class(
+            request.user, data=serializer_data, partial=True
+        )
+        serializer.is_valid(raise_exception=True)
+        serializer.save()
+        return Response(serializer.data, status=status.HTTP_200_OK)
+
+
+class AllDataAPIView(APIView):
+    # for all data (retrieve)
+    permission_classes = (IsAuthenticated,)
+    renderer_classes = (UserJSONRenderer,)
+
+    def get(self, request):
+        user = request.user
+        data = {
+            "user": UserSerializer(user).data,
+            "donor_card": DonorCardSerializer(user).data,
+            "donations": DonationSerializer(Donation.objects.filter(user=user)).data,
+            "plan_donations": PlanDonationSerializer(PlanDonation.objects.filter(user=user)).data
+        }
+        return Response(data, status=status.HTTP_200_OK)
+
+
 class DonationViewSet(viewsets.ViewSet):
+    # for donations (list, create, retrieve, update, delete)
     permission_classes = (IsAuthenticated,)  # Требуется авторизация через токен
 
     def list(self, request):
