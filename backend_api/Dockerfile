@@ -19,6 +19,7 @@ COPY backend_api/manage.py /code/
 # Run makemigrations
 CMD ["python", "manage.py", "migrate"]
 CMD ["python", "manage.py", "makemigrations"]
+CMD ["python", "manage.py", "migrate"]
 CMD ["python", "manage.py", "makemigrations", "backend_api_app"]
 CMD ["python", "manage.py", "migrate"]
 CMD ["python", "manage.py", "migrate"]
