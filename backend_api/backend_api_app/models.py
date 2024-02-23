@@ -180,7 +180,7 @@ class UserBonus(models.Model):
 class BonusFeedback(models.Model):
     user_bonus = models.ForeignKey(UserBonus, on_delete=models.CASCADE)
     feedback = models.TextField(max_length=500)
-    date = models.DateTimeField(auto_now_add=True)
+    date = models.DateTimeField(auto_now_add=True, null=False)
     mark = models.IntegerField()
 
 
@@ -189,7 +189,7 @@ class BonusFeedback(models.Model):
 class Donation(models.Model):
     user = models.ForeignKey(User, on_delete=models.CASCADE)
     is_confirmed = models.BooleanField(default=False)
-    date = models.DateTimeField(auto_now_add=True)
+    date = models.DateTimeField(auto_now_add=True, null=False),
     blood_station_id = models.IntegerField()
     donation_type = models.CharField(max_length=20, choices=DONATION_TYPES_CHOICES, null=False, blank=False,
                                      default='blood')
@@ -198,7 +198,7 @@ class Donation(models.Model):
 
 class PlanDonation(models.Model):
     user = models.ForeignKey(User, on_delete=models.CASCADE)
-    date = models.DateTimeField()
+    date = models.DateTimeField(auto_now_add=True)
     blood_station_id = models.IntegerField()
     donation_type = models.CharField(max_length=20, choices=DONATION_TYPES_CHOICES, null=False,
                                      blank=False, default='blood'),

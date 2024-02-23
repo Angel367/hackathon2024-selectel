@@ -128,9 +128,15 @@ class MainUserAPIView(APIView):
         data.update({
             "donor_card": donor_card,
             "donations": MyDonationSerializer(Donation.objects.filter(user=user), many=True).data,
-            "plan_donations": UserPlanDonationSerializer(PlanDonation.objects.filter(user=user), many=True).data
+            "plan_donations": UserPlanDonationSerializer(PlanDonation.objects.filter(user=user), many=True).data,
+            "count_donations_all": Donation.objects.filter(user=user).count(),
+            "count_donations_plasma": Donation.objects.filter(user=user, donation_type='plasma').count(),
+            "count_donations_blood": Donation.objects.filter(user=user, donation_type='blood').count(),
+            "count_donations_platelets": Donation.objects.filter(user=user, donation_type='platelets').count(),
+            "count_donations_eritrocytes": Donation.objects.filter(user=user, donation_type='eritrocytes').count(),
+            "count_donations_granulocytes": Donation.objects.filter(user=user, donation_type='granulocytes').count(),
+            "count_donations_is_free": Donation.objects.filter(user=user, is_free=True).count()
         })
-
         return Response(data, status=status.HTTP_200_OK)
 
 
