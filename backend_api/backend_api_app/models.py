@@ -19,15 +19,21 @@ class UserManager(BaseUserManager):
     же самого кода, который Django использовал для создания User (для демонстрации).
     """
 
-    def create_user(self, username, email, password=None):
+    def create_user(self, phone_number=None, email=None, password=None):
         """ Создает и возвращает пользователя с имэйлом, паролем и именем. """
-        if username is None:
-            raise TypeError('Users must have a username.')
+        if email is not None:
+            if User.objects.filter(email=email).exists():
+                raise ValueError('User with this email already exists')
+            username = email
+            user = self.model(username=username, email=email, phone_number=None)
+        elif phone_number is not None:
+            if User.objects.filter(phone_number=phone_number).exists():
+                raise ValueError('User with this phone number already exists')
+            username = phone_number
+            user = self.model(username=username, email=None, phone_number=phone_number)
+        else:
+            raise TypeError('Users must have an email address or phone number.')
 
-        if email is None:
-            raise TypeError('Users must have an email address.')
-
-        user = self.model(username=username, email=self.normalize_email(email))
         user.set_password(password)
         user.save()
 
@@ -48,7 +54,8 @@ class UserManager(BaseUserManager):
 
 class User(AbstractBaseUser, PermissionsMixin):
     username = models.CharField(db_index=True, max_length=255, unique=True)
-    email = models.EmailField(db_index=True, unique=True)
+    email = models.EmailField(db_index=True, null=True, unique=True)
+    phone_number = models.CharField(db_index=True,  max_length=10, null=True,unique=True)
     is_active = models.BooleanField(default=True)
     is_staff = models.BooleanField(default=False)
     created_at = models.DateTimeField(auto_now_add=True)
@@ -60,16 +67,18 @@ class User(AbstractBaseUser, PermissionsMixin):
 
     # Свойство USERNAME_FIELD сообщает нам, какое поле мы будем использовать
     # для входа в систему. В данном случае мы хотим использовать почту.
-    USERNAME_FIELD = 'email'
-    REQUIRED_FIELDS = ['username']
+    USERNAME_FIELD = 'username'
+    REQUIRED_FIELDS = ['']
 
     # Сообщает Django, что определенный выше класс UserManager
     # должен управлять объектами этого типа.
     objects = UserManager()
 
+
+
     def __str__(self):
         """ Строковое представление модели (отображается в консоли) """
-        return self.email
+        return self.username
 
     @property
     def token(self):

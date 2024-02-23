@@ -13,4 +13,6 @@ urlpatterns = [
     path('users/', RegistrationAPIView.as_view()),
     path('users/login/', LoginAPIView.as_view()),
     path('', include(router.urls)),
+    # path('users/login-email', LoginEmailAPIView.as_view()),
+
 ]

@@ -1,10 +1,30 @@
 import jwt
 
 from django.conf import settings
+from django.contrib.auth.backends import ModelBackend
 
 from rest_framework import authentication, exceptions
 
 from .models import User
+
+
+class EmailPhoneAuthBackend(ModelBackend):
+    def authenticate(self, request, username=None, password=None, **kwargs):
+        if User.objects.filter(email=username).exists():
+            user = User.objects.filter(email=username)[0]
+        elif User.objects.filter(phone_number=username).exists():
+            user = User.objects.filter(phone_number=username)[0]
+        else:
+            return None
+        if user.check_password(password):
+            return user
+        return None
+
+    def get_user(self, user_id):
+        if User.objects.filter(pk=user_id).exists():
+            return User.objects.get(pk=user_id)
+        else:
+            return None
 
 
 class JWTAuthentication(authentication.BaseAuthentication):
@@ -76,7 +96,7 @@ class JWTAuthentication(authentication.BaseAuthentication):
 
         try:
             user = User.objects.get(pk=payload['id'])
-        except User.DoesNotExist:
+        except Exception:
             msg = 'Пользователь соответствующий данному токену не найден.'
             raise exceptions.AuthenticationFailed(msg)
 
@@ -84,4 +104,4 @@ class JWTAuthentication(authentication.BaseAuthentication):
             msg = 'Данный пользователь деактивирован.'
             raise exceptions.AuthenticationFailed(msg)
         request.user = user
-        return (user, token)
+        return user, token

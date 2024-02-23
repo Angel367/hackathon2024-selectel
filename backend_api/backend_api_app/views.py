@@ -28,7 +28,6 @@ class RegistrationAPIView(APIView):
         serializer = self.serializer_class(data=user)
         serializer.is_valid(raise_exception=True)
         serializer.save()
-
         return Response(serializer.data, status=status.HTTP_201_CREATED)
 
 
@@ -39,13 +38,8 @@ class LoginAPIView(APIView):
 
     def post(self, request):
         user = request.data.get('user', {})
-
-        # Обратите внимание, что мы не вызываем метод save() сериализатора, как
-        # делали это для регистрации. Дело в том, что в данном случае нам
-        # нечего сохранять. Вместо этого, метод validate() делает все нужное.
         serializer = self.serializer_class(data=user)
         serializer.is_valid(raise_exception=True)
-
         return Response(serializer.data, status=status.HTTP_200_OK)
 
 
