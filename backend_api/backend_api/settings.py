@@ -54,6 +54,9 @@ REST_FRAMEWORK = {
 AUTH_USER_MODEL = 'backend_api_app.User'
 
 CORS_ORIGIN_ALLOW_ALL = True
+CORS_ALLOW_HEADERS = '*'
+
+APPEND_SLASH = True
 
 MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware',
