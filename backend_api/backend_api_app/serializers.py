@@ -1,71 +1,91 @@
-from rest_framework import serializers
 from django.contrib.auth import authenticate
+from rest_framework import serializers
 
+from .backends import EmailPhoneAuthBackend
 from .models import User
 
 
 class RegistrationSerializer(serializers.ModelSerializer):
     """ Сериализация регистрации пользователя и создания нового. """
-
-    # Убедитесь, что пароль содержит не менее 8 символов, не более 128,
-    # и так же что он не может быть прочитан клиентской стороной
+    phone_number = serializers.CharField(max_length=10, required=False)
+    email = serializers.EmailField(max_length=255, required=False)
+    username = serializers.CharField(max_length=255, required=False)
     password = serializers.CharField(
         max_length=128,
         min_length=8,
         write_only=True
     )
-
-    # Клиентская сторона не должна иметь возможность отправлять токен вместе с
-    # запросом на регистрацию. Сделаем его доступным только на чтение.
     token = serializers.CharField(max_length=255, read_only=True)
 
     class Meta:
         model = User
         # Перечислить все поля, которые могут быть включены в запрос
         # или ответ, включая поля, явно указанные выше.
-        fields = ['email', 'username', 'password', 'token', 'id']
+        fields = ['email', 'username', 'phone_number', 'password', 'token', 'id']
+
+    def validate(self, data):
+        email = data.get('email', None)
+        phone_number = data.get('phone_number', None)
+        username = data.get('username', None)
+
+        # Проверить, что предоставлен ли email или номер телефона.
+        if email is None and phone_number is None:
+            raise serializers.ValidationError(
+                'A phone number or email is required to register.'
+            )
+        if email is not None:
+            # Проверить, что предоставленный email уникален.
+            if User.objects.filter(email=email).exists():
+                raise serializers.ValidationError(
+                    'A user with this email already exists.'
+                )
+        if phone_number is not None:
+            # Проверить, что предоставленный номер телефона уникален.
+            if User.objects.filter(phone_number=phone_number).exists():
+                raise serializers.ValidationError(
+                    'A user with this phone number already exists.'
+                )
+        if username is not None:
+            # Проверить, что предоставленный username уникален.
+            if User.objects.filter(username=username).exists():
+                raise serializers.ValidationError(
+                    'A user with this username already exists.'
+                )
+
+        return data
 
     def create(self, validated_data):
-        # Использовать метод create_user, который мы
-        # написали ранее, для создания нового пользователя.
         return User.objects.create_user(**validated_data)
 
 
 class LoginSerializer(serializers.Serializer):
-    email = serializers.CharField(max_length=255)
-    username = serializers.CharField(max_length=255, read_only=True)
+    phone_number = serializers.CharField(max_length=10, required=False)
     password = serializers.CharField(max_length=128, write_only=True)
     token = serializers.CharField(max_length=255, read_only=True)
     id = serializers.IntegerField(read_only=True)
+    email = serializers.EmailField(max_length=255, required=False)
 
     def validate(self, data):
-        # В методе validate мы убеждаемся, что текущий экземпляр
-        # LoginSerializer значение valid. В случае входа пользователя в систему
-        # это означает подтверждение того, что присутствуют адрес электронной
-        # почты и то, что эта комбинация соответствует одному из пользователей.
         email = data.get('email', None)
+        phone_number = data.get('phone_number', None)
         password = data.get('password', None)
 
         # Вызвать исключение, если не предоставлена почта.
-        if email is None:
+        if phone_number is None and email is None:
             raise serializers.ValidationError(
-                'An email address is required to log in.'
+                'An email or phone number is required to log in.'
             )
-
         # Вызвать исключение, если не предоставлен пароль.
         if password is None:
             raise serializers.ValidationError(
                 'A password is required to log in.'
             )
-
-        # Метод authenticate предоставляется Django и выполняет проверку, что
-        # предоставленные почта и пароль соответствуют какому-то пользователю в
-        # нашей базе данных. Мы передаем email как username, так как в модели
-        # пользователя USERNAME_FIELD = email.
-        user = authenticate(username=email, password=password)
-
-        # Если пользователь с данными почтой/паролем не найден, то authenticate
-        # вернет None. Возбудить исключение в таком случае.
+        if phone_number is not None:
+            user = authenticate(username=phone_number, password=password)
+        elif email is not None:
+            user = authenticate(username=email, password=password)
+        else:
+            user = None
         if user is None:
             raise serializers.ValidationError(
                 'A user with this email and password was not found.'
@@ -83,10 +103,14 @@ class LoginSerializer(serializers.Serializer):
         # данные, которые передются в т.ч. в методы create и update.
         return {
             'email': user.email,
+            'phone_number': user.phone_number,
             'username': user.username,
             'token': user.token,
             'id': user.id
         }
+
+
+
 
 
 class UserSerializer(serializers.ModelSerializer):
