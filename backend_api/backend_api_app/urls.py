@@ -10,7 +10,7 @@ router.register(r'plan_donations', PlanDonationViewSet, basename='plan_donations
 
 
 urlpatterns = [
-    path('user', UserRetrieveUpdateAPIView.as_view()),
+    path('user/', UserRetrieveUpdateAPIView.as_view()),
     path('users/', RegistrationAPIView.as_view()),
     path('users/login/', LoginAPIView.as_view()),
     path('', include(router.urls))
