@@ -23,7 +23,7 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 SECRET_KEY = 'django-insecure-u6*c6)h&#j9wv3vfi*9+u23(o8=!1vu_58294sfti-l1hjq!vm'
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = True
+DEBUG = False
 
 ALLOWED_HOSTS = ['*']
 
@@ -100,6 +100,10 @@ DATABASES = {
         'NAME': BASE_DIR / 'db.sqlite3',
     }
 }
+
+SECURE_SSL_REDIRECT = True
+SECURE_SSL_CERTIFICATE = 'ssl/certificate.pem'
+SECURE_SSL_KEY = 'ssl/private_key.key'
 
 
 # Password validation
