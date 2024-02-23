@@ -101,9 +101,9 @@ DATABASES = {
     }
 }
 
-SECURE_SSL_REDIRECT = True
-SECURE_SSL_CERTIFICATE = 'ssl/certificate.pem'
-SECURE_SSL_KEY = 'ssl/private_key.key'
+#SECURE_SSL_REDIRECT = True
+# SECURE_SSL_CERTIFICATE = 'ssl/certificate.pem'
+# SECURE_SSL_KEY = 'ssl/private_key.key'
 
 
 # Password validation
