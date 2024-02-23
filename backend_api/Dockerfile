@@ -14,9 +14,12 @@ RUN pip install --no-cache-dir -r requirements.txt
 
 # Copy the current directory contents into the container at /code/
 COPY . /code/
+COPY manage.py /code/
 
 # Run makemigrations
 RUN python manage.py makemigrations
 
 # Run migrations
 RUN python manage.py migrate
+
+RUN python manage.py runserver 0.0.0.0:8000
