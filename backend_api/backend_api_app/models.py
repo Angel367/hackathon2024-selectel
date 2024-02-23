@@ -1,3 +1,4 @@
+import re
 import time
 
 import jwt
@@ -19,20 +20,23 @@ class UserManager(BaseUserManager):
     же самого кода, который Django использовал для создания User (для демонстрации).
     """
 
-    def create_user(self, phone_number=None, email=None, password=None):
+    def create_user(self, username=None, password=None):
         """ Создает и возвращает пользователя с имэйлом, паролем и именем. """
-        if email is not None:
-            if User.objects.filter(email=email).exists():
-                raise ValueError('User with this email already exists')
-            username = email
-            user = self.model(username=username, email=email, phone_number=None)
-        elif phone_number is not None:
-            if User.objects.filter(phone_number=phone_number).exists():
-                raise ValueError('User with this phone number already exists')
-            username = phone_number
-            user = self.model(username=username, email=None, phone_number=phone_number)
-        else:
-            raise TypeError('Users must have an email address or phone number.')
+        if username is not None:
+            phone_pattern = r'^(?:\+7|8)\s?\(?\d{3}\)?[\s.-]?\d{3}[\s.-]?\d{2}[\s.-]?\d{2}$'
+            email_pattern = r'^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$'
+            if re.match(phone_pattern, username):
+                user = self.model(
+                    phone_number=username,
+                    username=username
+                )
+            elif re.match(email_pattern, username):
+                user = self.model(
+                    email=username,
+                    username=username
+                )
+            else:
+                raise ValueError('Поле username не является валидным номером телефона или email')
 
         user.set_password(password)
         user.save()

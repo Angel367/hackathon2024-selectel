@@ -1,3 +1,5 @@
+import re
+
 from django.contrib.auth import authenticate
 from rest_framework import serializers
 
@@ -25,33 +27,29 @@ class RegistrationSerializer(serializers.ModelSerializer):
         fields = ['email', 'username', 'phone_number', 'password', 'token', 'id']
 
     def validate(self, data):
-        email = data.get('email', None)
-        phone_number = data.get('phone_number', None)
         username = data.get('username', None)
+        phone_pattern = r'^(?:\+7|8)\s?\(?\d{3}\)?[\s.-]?\d{3}[\s.-]?\d{2}[\s.-]?\d{2}$'
+        email_pattern = r'^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$'
 
-        # Проверить, что предоставлен ли email или номер телефона.
-        if email is None and phone_number is None:
+        if username is None:
             raise serializers.ValidationError(
-                'A phone number or email is required to register.'
+                'A username is required to register.'
             )
-        if email is not None:
-            # Проверить, что предоставленный email уникален.
-            if User.objects.filter(email=email).exists():
-                raise serializers.ValidationError(
-                    'A user with this email already exists.'
-                )
-        if phone_number is not None:
-            # Проверить, что предоставленный номер телефона уникален.
-            if User.objects.filter(phone_number=phone_number).exists():
+
+        if re.match(phone_pattern, username):
+            if User.objects.filter(phone_number=username).exists():
                 raise serializers.ValidationError(
                     'A user with this phone number already exists.'
                 )
-        if username is not None:
-            # Проверить, что предоставленный username уникален.
-            if User.objects.filter(username=username).exists():
+        elif re.match(email_pattern, username):
+            if User.objects.filter(email=username).exists():
                 raise serializers.ValidationError(
-                    'A user with this username already exists.'
+                    'A user with this email already exists.'
                 )
+        else:
+            raise serializers.ValidationError(
+                'Поле username не является валидным номером телефона или email'
+            )
 
         return data
 
@@ -60,33 +58,32 @@ class RegistrationSerializer(serializers.ModelSerializer):
 
 
 class LoginSerializer(serializers.Serializer):
-    phone_number = serializers.CharField(max_length=10, required=False)
+    username = serializers.CharField(max_length=255, required=False)
     password = serializers.CharField(max_length=128, write_only=True)
+    phone_number = serializers.CharField(max_length=10, required=False)
     token = serializers.CharField(max_length=255, read_only=True)
     id = serializers.IntegerField(read_only=True)
     email = serializers.EmailField(max_length=255, required=False)
 
     def validate(self, data):
-        email = data.get('email', None)
-        phone_number = data.get('phone_number', None)
+        username = data.get('username', None)
+        phone_pattern = r'^(?:\+7|8)\s?\(?\d{3}\)?[\s.-]?\d{3}[\s.-]?\d{2}[\s.-]?\d{2}$'
+        email_pattern = r'^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$'
         password = data.get('password', None)
 
-        # Вызвать исключение, если не предоставлена почта.
-        if phone_number is None and email is None:
-            raise serializers.ValidationError(
-                'An email or phone number is required to log in.'
-            )
         # Вызвать исключение, если не предоставлен пароль.
         if password is None:
             raise serializers.ValidationError(
                 'A password is required to log in.'
             )
-        if phone_number is not None:
-            user = authenticate(username=phone_number, password=password)
-        elif email is not None:
-            user = authenticate(username=email, password=password)
-        else:
-            user = None
+
+        if username is None:
+            raise serializers.ValidationError(
+                'A username is required to login.'
+            )
+
+        user = authenticate(username=username, password=password)
+
         if user is None:
             raise serializers.ValidationError(
                 'A user with this email and password was not found.'
