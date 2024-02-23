@@ -232,4 +232,4 @@ class UserPlanDonationSerializer(serializers.ModelSerializer):
 class DonationForTopSerializer(serializers.ModelSerializer):
     class Meta:
         model = Donation
-        fields = '__all__'
+        fields = '__all__'  # This will include all fields from the Donation model

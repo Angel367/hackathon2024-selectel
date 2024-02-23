@@ -1,3 +1,6 @@
+import json
+
+from django.http import JsonResponse
 from rest_framework import status, viewsets, permissions
 from rest_framework.decorators import action
 from rest_framework.generics import RetrieveUpdateAPIView
@@ -214,8 +217,37 @@ class DonationTopApiView(APIView):
                 blood_station_id=request.query_params.get('blood_center_id'),
                 is_confirmed=True
             )
+
             serializer = DonationForTopSerializer(donations, many=True)
-            return Response(serializer.data, status=status.HTTP_200_OK)
+            serializer_return_list = serializer.data
+
+            converted_data = []
+            for ordered_dict in serializer_return_list:
+                converted_data.append(dict(ordered_dict))
+
+            user_donations = {}
+            donation_types = {'plasma', 'blood', 'platelets'}
+
+            # Iterate through donations
+            for donation in converted_data:
+                user_id = donation['user']
+                donation_type = donation['donation_type']
+
+                # Initialize user entry if not exists
+                if user_id not in user_donations:
+                    user_donations[user_id] = {'user_id': user_id, 'total_amount': 0, 'plasma_amount': 0,
+                                               'blood_amount': 0, 'platelets_amount': 0}
+
+                # Increment total_amount and specific donation type amount
+
+                if donation_type in donation_types:
+                    user_donations[user_id]['total_amount'] += 1
+                    user_donations[user_id][donation_type + '_amount'] += 1
+
+            # Convert dictionary values to list of dictionaries
+            grouped_data = list(user_donations.values())
+
+            return JsonResponse(grouped_data, status=status.HTTP_200_OK, content_type='application/json', safe=False)
         else:
             return Response(Donation.objects.all(), status=status.HTTP_200_OK)
 
