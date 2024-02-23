@@ -175,7 +175,6 @@ class UserSerializer(serializers.ModelSerializer):
 
 
     def update(self, instance, validated_data):
-
         old_password = validated_data.pop('old_password', None)
         new_password = validated_data.pop('new_password', None)
         for key, value in validated_data.items():
