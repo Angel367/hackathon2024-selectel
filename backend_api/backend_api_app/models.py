@@ -36,9 +36,9 @@ KELL_FACTOR_CHOICES = (
 DONATION_TYPES_CHOICES = (
     ('blood', 'Цельная кровь'),
     ('plasma', 'Плазма'),
-    ('Platelets', 'Тромбоциты'),
-    ('Erythrocytes', 'Эритроциты'),
-    ('Granulocytes', 'Гранулоциты')
+    ('platelets', 'Тромбоциты'),
+    ('erythrocytes', 'Эритроциты'),
+    ('granulocytes', 'Гранулоциты')
 )
 DONOR_STATUS_CHOICES = (
     ('Legendary', 'Легендарный'),
@@ -191,7 +191,7 @@ class Donation(models.Model):
     is_confirmed = models.BooleanField(default=False)
     date = models.DateTimeField(auto_now_add=True)
     blood_station_id = models.IntegerField()
-    donation_type = models.CharField(max_length=20, choices=DONATION_TYPES_CHOICES),
+    donation_type = models.CharField(max_length=20, choices=DONATION_TYPES_CHOICES, null=False, blank=False)
     is_free = models.BooleanField(default=True)
 
 

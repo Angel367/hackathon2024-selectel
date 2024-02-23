@@ -1,3 +1,6 @@
+import json
+
+from django.http import JsonResponse
 from rest_framework import status, viewsets, permissions
 from rest_framework.decorators import action
 from rest_framework.generics import RetrieveUpdateAPIView
@@ -6,11 +9,8 @@ from rest_framework.response import Response
 from rest_framework.views import APIView
 from django.db.models import Q
 from .renderers import UserJSONRenderer
-from .serializers import (
-    LoginSerializer, RegistrationSerializer, UserSerializer, DonationSerializer, PlanDonationSerializer,
-    DonorCardSerializer, UserBonusSerializer, BonusFeedbackSerializer, ArticleSerializer, SpecialProjectSerializer
-)
-from .models import Donation, PlanDonation, UserBonus, BonusFeedback, Article, SpecialProject
+from .serializers import *
+from .models import Donation, PlanDonation
 
 
 class RegistrationAPIView(APIView):
@@ -126,27 +126,26 @@ class MainUserAPIView(APIView):
         data = {
             "user": UserSerializer(user).data,
             "donor_card": DonorCardSerializer(user).data,
-            "donations": DonationSerializer(Donation.objects.filter(user=user)).data,
-            "plan_donations": PlanDonationSerializer(PlanDonation.objects.filter(user=user)).data,
-            # "bonus": UserBonusSerializer(UserBonus.objects.filter(user=user)).data
+            "donations": MyDonationSerializer(Donation.objects.filter(user=user)).data,
+            "plan_donations": UserPlanDonationSerializer(PlanDonation.objects.filter(user=user)).data
         }
         return Response(data, status=status.HTTP_200_OK)
 
 
-class DonationViewSet(viewsets.ViewSet):
+class UserDonationViewSet(viewsets.ViewSet):
     # for donations (list, create, retrieve, update, delete)
     permission_classes = (IsAuthenticated,)  # Требуется авторизация через токен
 
     def list(self, request):
         donations = Donation.objects.filter(user=request.user)
-        serializer = DonationSerializer(donations, many=True)
+        serializer = MyDonationSerializer(donations, many=True)
         return Response(serializer.data)
 
     def create(self, request):
         user = request.user
         data = request.data.copy()
         data['user'] = user.id
-        serializer = DonationSerializer(data=data)
+        serializer = MyDonationSerializer(data=data)
 
         if serializer.is_valid():
             serializer.save()
@@ -159,7 +158,7 @@ class DonationViewSet(viewsets.ViewSet):
         except Donation.DoesNotExist:
             return Response(status=status.HTTP_404_NOT_FOUND)
 
-        serializer = DonationSerializer(donation)
+        serializer = MyDonationSerializer(donation)
         return Response(serializer.data)
 
     def update(self, request, pk=None):  # Add update method to handle PUT requests
@@ -172,7 +171,7 @@ class DonationViewSet(viewsets.ViewSet):
         except Donation.DoesNotExist:
             return Response(status=status.HTTP_404_NOT_FOUND)
 
-        serializer = DonationSerializer(donation, data=data)
+        serializer = MyDonationSerializer(donation, data=data)
         if serializer.is_valid():
             serializer.save()
             return Response(serializer.data)
@@ -190,19 +189,19 @@ class DonationViewSet(viewsets.ViewSet):
         return Response(status=status.HTTP_204_NO_CONTENT, data={"Успешно удалено"})
 
 
-class PlanDonationViewSet(viewsets.ViewSet):
+class UserPlanDonationViewSet(viewsets.ViewSet):
     permission_classes = (IsAuthenticated,)  # Требуется авторизация через токен
 
     def list(self, request):
         donations = PlanDonation.objects.filter(user=request.user)
-        serializer = PlanDonationSerializer(donations, many=True)
+        serializer = UserPlanDonationSerializer(donations, many=True)
         return Response(serializer.data)
 
     def create(self, request):
         user = request.user
         data = request.data.copy()
         data['user'] = user.id
-        serializer = PlanDonationSerializer(data=data)
+        serializer = UserPlanDonationSerializer(data=data)
 
         if serializer.is_valid():
             serializer.save()
@@ -215,7 +214,7 @@ class PlanDonationViewSet(viewsets.ViewSet):
         except PlanDonation.DoesNotExist:
             return Response(status=status.HTTP_404_NOT_FOUND)
 
-        serializer = PlanDonationSerializer(donation)
+        serializer = UserPlanDonationSerializer(donation)
         return Response(serializer.data)
 
     def update(self, request, pk=None):  # Add update method to handle PUT requests
@@ -228,11 +227,55 @@ class PlanDonationViewSet(viewsets.ViewSet):
         except Donation.DoesNotExist:
             return Response(status=status.HTTP_404_NOT_FOUND)
 
-        serializer = PlanDonationSerializer(donation, data=data)
+        serializer = UserPlanDonationSerializer(donation, data=data)
         if serializer.is_valid():
             serializer.save()
             return Response(serializer.data)
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
+
+class DonationTopApiView(APIView):
+    def get(self, request):
+        if request.query_params.get('blood_center_id'):
+            donations = Donation.objects.filter(
+                blood_station_id=request.query_params.get('blood_center_id'),
+                is_confirmed=True
+            )
+
+            serializer = DonationForTopSerializer(donations, many=True)
+            serializer_return_list = serializer.data
+
+            converted_data = []
+            for ordered_dict in serializer_return_list:
+                converted_data.append(dict(ordered_dict))
+
+            user_donations = {}
+            donation_types = {'plasma', 'blood', 'platelets'}
+
+            # Iterate through donations
+            for donation in converted_data:
+                user_id = donation['user']
+                donation_type = donation['donation_type']
+
+                # Initialize user entry if not exists
+                if user_id not in user_donations:
+                    user_donations[user_id] = {'user_id': user_id, 'total_amount': 0, 'plasma_amount': 0,
+                                               'blood_amount': 0, 'platelets_amount': 0}
+
+                # Increment total_amount and specific donation type amount
+
+                if donation_type in donation_types:
+                    user_donations[user_id]['total_amount'] += 1
+                    user_donations[user_id][donation_type + '_amount'] += 1
+
+            # Convert dictionary values to list of dictionaries
+            grouped_data = list(user_donations.values())
+
+            return JsonResponse(grouped_data, status=status.HTTP_200_OK, content_type='application/json', safe=False)
+        else:
+            return Response(Donation.objects.all(), status=status.HTTP_200_OK)
+
+
 
 
 class ArticleViewSet(viewsets.ViewSet):
