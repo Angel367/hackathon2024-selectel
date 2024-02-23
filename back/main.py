@@ -3,7 +3,7 @@ import telebot
 
 bot = telebot.TeleBot('6973167122:AAGzL7wlBqxp6ocVt5HwpR_bSxKmKgt-Y4Q')
 
-main_url = "https://donor-frontend.vercel.app/"
+main_url = "https://donorsearchorg.ru/"
 
 
 buttons = [
@@ -45,7 +45,7 @@ def web_app_keyboard():  # создание клавиатуры с webapp кн�
 
 def web_app_keyboard_inline():  # создание inline-клавиатуры с webapp кнопкой
     keyboard = types.InlineKeyboardMarkup(row_width=2)  # создаем клавиатуру inline
-    web_app = types.WebAppInfo("https://donor-frontend-am1f28v2e-kchaumeow.vercel.app/")  # создаем webappinfo - формат хранения url
+    web_app = types.WebAppInfo(main_url)  # создаем webappinfo - формат хранения url
     one = types.InlineKeyboardButton(text="Веб приложение", web_app=web_app)  # создаем кнопку типа webapp
     keyboard.add(one)  # добавляем кнопку в клавиатуру
 
