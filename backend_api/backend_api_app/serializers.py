@@ -202,11 +202,13 @@ class UserSerializer(serializers.ModelSerializer):
             raise serializers.ValidationError(
                 'Old password is required to change password.'
             )
-        if not instance.check_password(old_password):
-            raise serializers.ValidationError(
-                'Old password is incorrect.'
-            )
-        instance.set_password(new_password)
+        if new_password:
+            if not instance.check_password(old_password):
+                raise serializers.ValidationError(
+                    'Old password is incorrect.'
+                )
+        else:
+            instance.set_password(new_password)
 
         # После того, как все было обновлено, мы должны сохранить наш экземпляр
         # User. Стоит отметить, что set_password() не сохраняет модель.
@@ -215,13 +217,19 @@ class UserSerializer(serializers.ModelSerializer):
         return instance
 
 
-class DonationSerializer(serializers.ModelSerializer):
+class MyDonationSerializer(serializers.ModelSerializer):
     class Meta:
         model = Donation
         fields = '__all__'  # This will include all fields from the Donation model
 
 
-class PlanDonationSerializer(serializers.ModelSerializer):
+class UserPlanDonationSerializer(serializers.ModelSerializer):
     class Meta:
         model = PlanDonation
         fields = '__all__'  # This will include all fields from the PlanDonation model
+
+
+class DonationForTopSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Donation
+        fields = '__all__'

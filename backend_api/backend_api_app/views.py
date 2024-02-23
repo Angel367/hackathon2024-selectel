@@ -6,10 +6,7 @@ from rest_framework.response import Response
 from rest_framework.views import APIView
 
 from .renderers import UserJSONRenderer
-from .serializers import (
-    LoginSerializer, RegistrationSerializer, UserSerializer, DonationSerializer, PlanDonationSerializer,
-    DonorCardSerializer
-)
+from .serializers import *
 from .models import Donation, PlanDonation
 
 
@@ -102,26 +99,26 @@ class AllDataAPIView(APIView):
         data = {
             "user": UserSerializer(user).data,
             "donor_card": DonorCardSerializer(user).data,
-            "donations": DonationSerializer(Donation.objects.filter(user=user)).data,
-            "plan_donations": PlanDonationSerializer(PlanDonation.objects.filter(user=user)).data
+            "donations": MyDonationSerializer(Donation.objects.filter(user=user)).data,
+            "plan_donations": UserPlanDonationSerializer(PlanDonation.objects.filter(user=user)).data
         }
         return Response(data, status=status.HTTP_200_OK)
 
 
-class DonationViewSet(viewsets.ViewSet):
+class UserDonationViewSet(viewsets.ViewSet):
     # for donations (list, create, retrieve, update, delete)
     permission_classes = (IsAuthenticated,)  # Требуется авторизация через токен
 
     def list(self, request):
         donations = Donation.objects.filter(user=request.user)
-        serializer = DonationSerializer(donations, many=True)
+        serializer = MyDonationSerializer(donations, many=True)
         return Response(serializer.data)
 
     def create(self, request):
         user = request.user
         data = request.data.copy()
         data['user'] = user.id
-        serializer = DonationSerializer(data=data)
+        serializer = MyDonationSerializer(data=data)
 
         if serializer.is_valid():
             serializer.save()
@@ -134,7 +131,7 @@ class DonationViewSet(viewsets.ViewSet):
         except Donation.DoesNotExist:
             return Response(status=status.HTTP_404_NOT_FOUND)
 
-        serializer = DonationSerializer(donation)
+        serializer = MyDonationSerializer(donation)
         return Response(serializer.data)
 
     def update(self, request, pk=None):  # Add update method to handle PUT requests
@@ -147,7 +144,7 @@ class DonationViewSet(viewsets.ViewSet):
         except Donation.DoesNotExist:
             return Response(status=status.HTTP_404_NOT_FOUND)
 
-        serializer = DonationSerializer(donation, data=data)
+        serializer = MyDonationSerializer(donation, data=data)
         if serializer.is_valid():
             serializer.save()
             return Response(serializer.data)
@@ -165,19 +162,19 @@ class DonationViewSet(viewsets.ViewSet):
         return Response(status=status.HTTP_204_NO_CONTENT, data={"Успешно удалено"})
 
 
-class PlanDonationViewSet(viewsets.ViewSet):
+class UserPlanDonationViewSet(viewsets.ViewSet):
     permission_classes = (IsAuthenticated,)  # Требуется авторизация через токен
 
     def list(self, request):
         donations = PlanDonation.objects.filter(user=request.user)
-        serializer = PlanDonationSerializer(donations, many=True)
+        serializer = UserPlanDonationSerializer(donations, many=True)
         return Response(serializer.data)
 
     def create(self, request):
         user = request.user
         data = request.data.copy()
         data['user'] = user.id
-        serializer = PlanDonationSerializer(data=data)
+        serializer = UserPlanDonationSerializer(data=data)
 
         if serializer.is_valid():
             serializer.save()
@@ -190,7 +187,7 @@ class PlanDonationViewSet(viewsets.ViewSet):
         except PlanDonation.DoesNotExist:
             return Response(status=status.HTTP_404_NOT_FOUND)
 
-        serializer = PlanDonationSerializer(donation)
+        serializer = UserPlanDonationSerializer(donation)
         return Response(serializer.data)
 
     def update(self, request, pk=None):  # Add update method to handle PUT requests
@@ -203,8 +200,23 @@ class PlanDonationViewSet(viewsets.ViewSet):
         except Donation.DoesNotExist:
             return Response(status=status.HTTP_404_NOT_FOUND)
 
-        serializer = PlanDonationSerializer(donation, data=data)
+        serializer = UserPlanDonationSerializer(donation, data=data)
         if serializer.is_valid():
             serializer.save()
             return Response(serializer.data)
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
+
+class DonationTopApiView(APIView):
+    def get(self, request):
+        if request.query_params.get('blood_center_id'):
+            donations = Donation.objects.filter(
+                blood_station_id=request.query_params.get('blood_center_id'),
+                is_confirmed=True
+            )
+            serializer = DonationForTopSerializer(donations, many=True)
+            return Response(serializer.data, status=status.HTTP_200_OK)
+        else:
+            return Response(Donation.objects.all(), status=status.HTTP_200_OK)
+
+
