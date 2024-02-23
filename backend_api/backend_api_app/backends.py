@@ -30,7 +30,7 @@ class JWTAuthentication(authentication.BaseAuthentication):
         # 'auth_header' должен быть массивом с двумя элементами:
         # 1) именем заголовка аутентификации (Token в нашем случае)
         # 2) сам JWT, по которому мы должны пройти аутентифкацию
-        auth_header = authentication.get_authorization_header(request).split()
+        auth_header = request.data.get('token', None).split()
         auth_header_prefix = self.authentication_header_prefix.lower()
 
         if not auth_header:
@@ -49,8 +49,8 @@ class JWTAuthentication(authentication.BaseAuthentication):
         # Python3 (HINT: использовать PyJWT). Чтобы точно решить это, нам нужно
         # декодировать prefix и token. Это не самый чистый код, но это хорошее
         # решение, потому что возможна ошибка, не сделай мы этого.
-        prefix = auth_header[0].decode('utf-8')
-        token = auth_header[1].decode('utf-8')
+        prefix = auth_header[0]
+        token = auth_header[1]
 
         if prefix.lower() != auth_header_prefix:
             # Префикс заголовка не тот, который мы ожидали - отказ.
@@ -66,7 +66,8 @@ class JWTAuthentication(authentication.BaseAuthentication):
         вернуть пользователя и токен, иначе - сгенерировать исключение.
         """
         try:
-            payload = jwt.decode(token, settings.SECRET_KEY)
+            print(token, settings.SECRET_KEY, jwt.decode(token, settings.SECRET_KEY, algorithms=['HS256']))
+            payload = jwt.decode(token, settings.SECRET_KEY, algorithms=['HS256'])
         except Exception:
             msg = 'Ошибка аутентификации. Невозможно декодировать токеню'
             raise exceptions.AuthenticationFailed(msg)
@@ -80,5 +81,5 @@ class JWTAuthentication(authentication.BaseAuthentication):
         if not user.is_active:
             msg = 'Данный пользователь деактивирован.'
             raise exceptions.AuthenticationFailed(msg)
-
+        request.user = user
         return (user, token)

@@ -1,4 +1,4 @@
-from rest_framework import status
+from rest_framework import status, viewsets, permissions
 from rest_framework.generics import RetrieveUpdateAPIView
 from rest_framework.permissions import AllowAny, IsAuthenticated
 from rest_framework.response import Response
@@ -6,8 +6,9 @@ from rest_framework.views import APIView
 
 from .renderers import UserJSONRenderer
 from .serializers import (
-    LoginSerializer, RegistrationSerializer, UserSerializer,
+    LoginSerializer, RegistrationSerializer, UserSerializer, DonationSerializer, PlanDonationSerializer
 )
+from .models import Donation, PlanDonation
 
 
 class RegistrationAPIView(APIView):
@@ -69,3 +70,30 @@ class UserRetrieveUpdateAPIView(RetrieveUpdateAPIView):
         serializer.save()
 
         return Response(serializer.data, status=status.HTTP_200_OK)
+
+
+class CreateDonationView(APIView):
+    permission_classes = (IsAuthenticated,)  # Требуется авторизация через токен
+
+    def post(self, request):
+        user = request.user  # Получаем пользователя из запроса
+
+        # Создаем сериализатор для сущности Donation, передавая данные из запроса
+        data = request.data.copy()  # Создаем копию данных запроса
+        data['user'] = user.id  # Добавляем текущего пользователя в данные запроса
+        serializer = DonationSerializer(data=data)
+
+        if serializer.is_valid():
+            # Устанавливаем пользователя для создаваемой сущности Donation
+            serializer.save()
+            return Response(serializer.data, status=status.HTTP_201_CREATED)
+        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
+
+class PlanDonationViewSet(viewsets.ModelViewSet):
+    queryset = PlanDonation.objects.all()
+    serializer_class = PlanDonationSerializer
+    permission_classes = [permissions.IsAuthenticated]  # Проверка авторизации пользователя
+
+    def perform_create(self, serializer):
+        serializer.save(user_id=self.request.user)

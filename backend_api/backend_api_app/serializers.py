@@ -1,7 +1,7 @@
 from rest_framework import serializers
 from django.contrib.auth import authenticate
 
-from .models import User
+from .models import User, Donation, PlanDonation
 
 
 class RegistrationSerializer(serializers.ModelSerializer):
@@ -137,3 +137,14 @@ class UserSerializer(serializers.ModelSerializer):
         instance.save()
 
         return instance
+
+
+class DonationSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Donation
+        fields = '__all__'  # This will include all fields from the Donation model
+
+class PlanDonationSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = PlanDonation
+        fields = '__all__'  # This will include all fields from the PlanDonation model

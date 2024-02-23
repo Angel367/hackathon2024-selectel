@@ -101,15 +101,38 @@ class User(AbstractBaseUser, PermissionsMixin):
 
         token = jwt.encode({
             'id': self.pk,
-            'exp': int(time.mktime(dt.timetuple()))
+            'exp': int(dt.timestamp())
         }, settings.SECRET_KEY, algorithm='HS256')
-
+        print(token, jwt.decode(token, settings.SECRET_KEY, algorithms=['HS256']))
         return token
 
 
 class Donation(models.Model):
-    user_id = models.ForeignKey(User, on_delete=models.CASCADE)
+    DONATION_TYPES_CHOICES = (
+        ('blood', 'Цельная кровь'),
+        ('plasma', 'Плазма'),
+        ('Platelets', 'Тромбоциты'),
+        ('Erythrocytes', 'Эритроциты'),
+        ('Granulocytes', 'Гранулоциты')
+    )
+    user = models.ForeignKey(User, on_delete=models.CASCADE)
     is_confirmed = models.BooleanField(default=False)
     date = models.DateTimeField(auto_now_add=True)
     blood_station_id = models.IntegerField()
-    # blood_type = models.CharField(max_length=255)
+    donation_type = models.CharField(max_length=20, choices=DONATION_TYPES_CHOICES),
+    is_free = models.BooleanField(default=True)
+
+
+class PlanDonation(models.Model):
+    DONATION_TYPES_CHOICES = (
+        ('blood', 'Цельная кровь'),
+        ('plasma', 'Плазма'),
+        ('Platelets', 'Тромбоциты'),
+        ('Erythrocytes', 'Эритроциты'),
+        ('Granulocytes', 'Гранулоциты')
+    )
+    user = models.ForeignKey(User, on_delete=models.CASCADE)
+    date = models.DateTimeField()
+    blood_station_id = models.IntegerField()
+    donation_type = models.CharField(max_length=20, choices=DONATION_TYPES_CHOICES),
+    is_free = models.BooleanField(default=True)
