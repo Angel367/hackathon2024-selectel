@@ -10,7 +10,7 @@ from rest_framework.views import APIView
 from django.db.models import Q
 from .renderers import UserJSONRenderer
 from .serializers import *
-from .models import Donation, PlanDonation
+from .models import Donation, PlanDonation, BonusFeedback
 
 
 class RegistrationAPIView(APIView):
@@ -56,7 +56,6 @@ class UserRetrieveUpdateAPIView(RetrieveUpdateAPIView):
         # сериализатор обрабатывал преобразования объекта User во что-то, что
         # можно привести к json и вернуть клиенту.
         serializer = self.serializer_class(request.user)
-
         return Response(serializer.data, status=status.HTTP_200_OK)
 
     def update(self, request, *args, **kwargs):
@@ -82,7 +81,7 @@ class DonorCardAPIView(RetrieveUpdateAPIView):
         return Response(serializer.data, status=status.HTTP_200_OK)
 
     def update(self, request, *args, **kwargs):
-        serializer_data = request.data.get('user', {})
+        serializer_data = request.data
 
         serializer = self.serializer_class(
             request.user, data=serializer_data, partial=True
