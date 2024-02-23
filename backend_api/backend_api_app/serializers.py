@@ -2,7 +2,7 @@ import re
 
 from django.contrib.auth import authenticate
 from rest_framework import serializers
-from .models import Donation, PlanDonation
+from .models import Donation, PlanDonation, UserBonus, Article, SpecialProject
 from .models import User
 
 
@@ -106,6 +106,14 @@ class LoginSerializer(serializers.Serializer):
         }
 
 
+class UserBonusSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = UserBonus
+        fields = ['bonus_id', 'date_expired', 'date_received']
+
+
+
+
 
 class DonorCardSerializer(serializers.ModelSerializer):
     token = serializers.CharField(max_length=255, read_only=True)
@@ -120,17 +128,6 @@ class DonorCardSerializer(serializers.ModelSerializer):
             setattr(instance, key, value)
         instance.save()
         return instance
-
-
-
-class AllDataUserSerializer(serializers.ModelSerializer):
-
-    class Meta:
-        model = User
-        read_only_fields = ('token')
-        exclude = ('password',  'is_active', 'is_staff', 'created_at',
-                   'updated_at', 'is_email_verified', 'is_phone_verified')
-
 
 
 class UserSerializer(serializers.ModelSerializer):
@@ -225,3 +222,22 @@ class PlanDonationSerializer(serializers.ModelSerializer):
     class Meta:
         model = PlanDonation
         fields = '__all__'  # This will include all fields from the PlanDonation model
+
+
+class BonusFeedbackSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = UserBonus
+        fields = '__all__'  # This will include all fields from the UserBonus model
+
+
+class ArticleSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Article
+        fields = '__all__'
+
+
+class SpecialProjectSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = SpecialProject
+        fields = '__all__'
+

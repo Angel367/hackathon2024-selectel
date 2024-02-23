@@ -4,13 +4,13 @@ from rest_framework.generics import RetrieveUpdateAPIView
 from rest_framework.permissions import AllowAny, IsAuthenticated
 from rest_framework.response import Response
 from rest_framework.views import APIView
-
+from django.db.models import Q
 from .renderers import UserJSONRenderer
 from .serializers import (
     LoginSerializer, RegistrationSerializer, UserSerializer, DonationSerializer, PlanDonationSerializer,
-    DonorCardSerializer
+    DonorCardSerializer, UserBonusSerializer, BonusFeedbackSerializer, ArticleSerializer, SpecialProjectSerializer
 )
-from .models import Donation, PlanDonation
+from .models import Donation, PlanDonation, UserBonus, BonusFeedback, Article, SpecialProject
 
 
 class RegistrationAPIView(APIView):
@@ -92,7 +92,31 @@ class DonorCardAPIView(RetrieveUpdateAPIView):
         return Response(serializer.data, status=status.HTTP_200_OK)
 
 
-class AllDataAPIView(APIView):
+class BonusFeedbackAPIView(APIView):
+    # for bonus feedback (retrieve)
+    permission_classes = (AllowAny,)
+    renderer_classes = (UserJSONRenderer,)
+
+    def get(self, request, bonus_id):
+        data = {
+            "feedbacks": BonusFeedbackSerializer(BonusFeedback.objects.filter(user_bonus__bonus_id=bonus_id)).data
+        }
+        return Response(data, status=status.HTTP_200_OK)
+
+
+class MyBonusAPIView(APIView):
+    # for bonus my (retrieve)
+    permission_classes = (IsAuthenticated,)
+    renderer_classes = (UserJSONRenderer,)
+    def get(self, request):
+        user = request.user
+        data = {
+            "bonus": UserBonusSerializer(UserBonus.objects.filter(user=user)).data
+        }
+        return Response(data, status=status.HTTP_200_OK)
+
+
+class MainUserAPIView(APIView):
     # for all data (retrieve)
     permission_classes = (IsAuthenticated,)
     renderer_classes = (UserJSONRenderer,)
@@ -103,7 +127,8 @@ class AllDataAPIView(APIView):
             "user": UserSerializer(user).data,
             "donor_card": DonorCardSerializer(user).data,
             "donations": DonationSerializer(Donation.objects.filter(user=user)).data,
-            "plan_donations": PlanDonationSerializer(PlanDonation.objects.filter(user=user)).data
+            "plan_donations": PlanDonationSerializer(PlanDonation.objects.filter(user=user)).data,
+            # "bonus": UserBonusSerializer(UserBonus.objects.filter(user=user)).data
         }
         return Response(data, status=status.HTTP_200_OK)
 
@@ -208,3 +233,46 @@ class PlanDonationViewSet(viewsets.ViewSet):
             serializer.save()
             return Response(serializer.data)
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
+
+class ArticleViewSet(viewsets.ViewSet):
+    permission_classes = (AllowAny,)  # Требуется авторизация через токен
+
+    def list(self, request):
+        keywords = request.query_params.get('keywords', None)
+        if keywords:
+            articles = (Article.objects.filter(is_active=True)
+                        .filter(Q(text__icontains=keywords) | Q(title__icontains=keywords)))
+        else:
+            articles = Article.objects.filter(is_active=True)
+        serializer = ArticleSerializer(articles, many=True)
+        return Response(serializer.data)
+
+    def retrieve(self, request, pk=None):  # Modify retrieve method to accept pk
+        try:
+            article = Article.objects.get(pk=pk)
+        except Article.DoesNotExist:
+            return Response(status=status.HTTP_404_NOT_FOUND)
+
+        serializer = ArticleSerializer(article)
+        return Response(serializer.data)
+
+
+class SpecialProjectViewSet(viewsets.ViewSet):
+    permission_classes = (AllowAny,)  # Требуется авторизация через токен
+
+    def list(self, request):
+        special_projects = SpecialProject.objects.filter(is_active=True)
+        serializer = SpecialProjectSerializer(special_projects, many=True)
+        return Response(serializer.data)
+
+    def retrieve(self, request, pk=None):  # Modify retrieve method to accept pk
+        try:
+            special_project = SpecialProject.objects.get(pk=pk)
+        except SpecialProject.DoesNotExist:
+            return Response(status=status.HTTP_404_NOT_FOUND)
+
+        serializer = ArticleSerializer(special_project)
+        return Response(serializer.data)
+
+
