@@ -23,7 +23,6 @@ function EditProfile() {
       gender: "unknown",
     },
   });
-  const navigate = useNavigate();
   const onSubmit = async (data) => {
     let userData;
     try {
@@ -35,7 +34,7 @@ function EditProfile() {
           arrayErrors.forEach((error) => {
             toast.error(error, {
               position: "top-right",
-              autoClose: 5000,
+              autoClose: 2000,
               hideProgressBar: false,
               closeOnClick: true,
               pauseOnHover: true,
@@ -47,7 +46,7 @@ function EditProfile() {
       } else {
         toast.error(err.message, {
           position: "top-right",
-          autoClose: 5000,
+          autoClose: 2000,
           hideProgressBar: false,
           closeOnClick: true,
           pauseOnHover: true,
@@ -57,8 +56,15 @@ function EditProfile() {
       }
     }
     setUser(userData.data);
-    navigate(`/users/${userData.data.user.username}`);
-    location.reload();
+    toast.success("Профиль успешно обновлен", {
+      position: "top-right",
+      autoClose: 2000,
+      hideProgressBar: false,
+      closeOnClick: true,
+      pauseOnHover: true,
+      draggable: true,
+      theme: "dark",
+    });
   };
   return (
     <div>
