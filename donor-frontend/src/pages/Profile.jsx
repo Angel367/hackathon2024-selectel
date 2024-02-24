@@ -103,6 +103,7 @@ export default function Profile() {
       >
         <img src="/logout.svg" width={50} height={50} />
       </button>
+      <Link to="/edit">Редактировать профиль</Link>
     </div>
   );
 }

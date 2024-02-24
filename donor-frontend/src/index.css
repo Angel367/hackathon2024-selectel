@@ -5,14 +5,10 @@
   font-family: "Montserrat Alternates", sans-serif;
 }
 
-html {
-  height: 100vh;
-}
-
 body {
   background: var(--tg-theme-bg-color);
   color: var(--tg-theme-text-color);
-  height: 100vh;
+  margin-bottom: 60px;
 }
 
 a {
@@ -29,11 +25,6 @@ a {
   font-size: medium;
   font-weight: 700;
   padding: 1rem;
-}
-
-main {
-  height: 100vh;
-  margin-bottom: 60px;
 }
 
 form {
@@ -178,7 +169,7 @@ label {
 }
 
 .donor-card {
-  background-color: --tg-theme-bg-color;
+  background-color: --tg-theme-secondary-bg-color;
   border-radius: 10px;
   box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
   padding: 15px 20px;
