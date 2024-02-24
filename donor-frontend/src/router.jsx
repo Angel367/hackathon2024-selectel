@@ -21,7 +21,11 @@ export const router = createBrowserRouter([
       },
       {
         path: "/users/:username",
-        element: <Profile />,
+        element: (
+          <Protected>
+            <Profile />
+          </Protected>
+        ),
       },
       {
         path: "/register",
@@ -41,7 +45,11 @@ export const router = createBrowserRouter([
       },
       {
         path: "/edit",
-        element: <EditProfile />,
+        element: (
+          <Protected>
+            <EditProfile />
+          </Protected>
+        ),
       },
       {
         path: "*",

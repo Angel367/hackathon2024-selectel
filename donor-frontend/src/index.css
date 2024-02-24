@@ -5,9 +5,14 @@
   font-family: "Montserrat Alternates", sans-serif;
 }
 
+html {
+  height: 100vh;
+}
+
 body {
   background: var(--tg-theme-bg-color);
   color: var(--tg-theme-text-color);
+  height: 100vh;
 }
 
 a {
@@ -24,6 +29,10 @@ a {
   font-size: medium;
   font-weight: 700;
   padding: 1rem;
+}
+
+main {
+  height: 100vh;
 }
 
 form {
@@ -142,13 +151,53 @@ label {
 .footer {
   display: flex;
   justify-content: space-evenly;
+  left: 0;
   bottom: 0;
-  position: sticky;
+  position: fixed;
   width: 100%;
   padding: 1rem;
   background-color: var(--tg-theme-secondary-bg-color);
-  background-color: white;
   color: var(--tg-theme-button-text-color);
   box-shadow: rgba(0, 0, 0, 0.35) 0px 5px 15px;
   align-items: center;
+}
+
+.container {
+    background-color: --tg-theme-bg-color;
+    padding: 30px;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+    text-align: center;
+    overflow: hidden;
+}
+.donor-list {
+    justify-content: center;
+    margin-top: 20px;
+}
+
+.donor-card {
+    background-color: --tg-theme-bg-color;
+    border-radius: 10px;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+    padding: 15px 20px;
+    width: 100%; /* Set the width to 100% to ensure each card occupies the full width of its container */
+    max-width: 100%; /* Set a maximum width if you want to limit the width of each card */
+    min-height: 170px;
+    text-align: center;
+    margin: 20px auto; /* Use auto margin to center the card horizontally */
+}
+
+
+h3 {
+    color: var(--tg-theme-text-color);
+    font-size: 18px;
+    font-weight: bold;
+    margin: 0;
+    padding: 0;
+}
+
+p {
+    color: var(--tg-theme-text-color);
+    font-size: 14px;
+    padding: 0;
+    margin: 0;
 }
