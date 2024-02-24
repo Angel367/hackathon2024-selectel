@@ -22,6 +22,10 @@ buttons = [
     {
         "text": "Топ доноров",
         "url": main_url + "top/"
+    },
+    {
+        "text": "dev button",
+        "url": "https://donor-frontend.vercel.app/"
     }
 ]
 
