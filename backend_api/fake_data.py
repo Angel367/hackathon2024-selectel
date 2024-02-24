@@ -17,7 +17,7 @@ person = Person('en')
 internet = Internet()
 
 # Create 10 users
-for _ in range(500):
+for _ in range(50):
     gender = random.choice([Gender.MALE, Gender.FEMALE])
     user = User.objects.create(
         username=fake.user_name(),
@@ -47,7 +47,7 @@ for _ in range(500):
     )
 
     # Create user bonuses
-    for _ in range(500):
+    for _ in range(250):
         UserBonus.objects.create(
             user=user,
             bonus_id=random.randint(1, 100),
@@ -56,7 +56,7 @@ for _ in range(500):
         )
 
     # Create bonus feedbacks
-    for _ in range(500):
+    for _ in range(250):
         BonusFeedback.objects.create(
             user=user,
             bonus_id=random.randint(1, 100),
@@ -66,7 +66,7 @@ for _ in range(500):
         )
 
     # Create donations
-    for _ in range(500):
+    for _ in range(250):
         Donation.objects.create(
             user=user,
             is_confirmed=fake.boolean(),
@@ -77,7 +77,7 @@ for _ in range(500):
         )
 
     # Create plan donations
-    for _ in range(500):
+    for _ in range(250):
         PlanDonation.objects.create(
             user=user,
             donation_date=fake.date_time_this_year(),
@@ -87,7 +87,7 @@ for _ in range(500):
         )
 
 # Create articles
-for _ in range(500):
+for _ in range(250):
     Article.objects.create(
         title=fake.sentence(),
         text=fake.text(max_nb_chars=1000),
@@ -98,7 +98,7 @@ for _ in range(500):
     )
 
 # Create special projects
-for _ in range(500):
+for _ in range(250):
     SpecialProject.objects.create(
         title=fake.sentence(),
         text=fake.text(max_nb_chars=1000),
@@ -109,7 +109,7 @@ for _ in range(500):
     )
 
 # Create user events
-for _ in range(500):
+for _ in range(250):
     UserEvent.objects.create(
         user=User.objects.order_by('?').first(),
         event_id=random.randint(1, 100),
