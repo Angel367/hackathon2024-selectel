@@ -9,6 +9,7 @@ import Login from "./pages/Login.jsx";
 import DonorsTop100 from "./pages/DonorsTop100.jsx";
 import Menu from "./pages/Menu.jsx";
 import EditProfile from "./pages/EditProfile.jsx";
+import DonorCard from "./pages/DonorCard.jsx";
 export const router = createBrowserRouter([
   {
     path: "/",
@@ -54,6 +55,14 @@ export const router = createBrowserRouter([
       {
         path: "*",
         element: <NotFound />,
+      },
+      {
+        path: "/donor-card",
+        element: (
+          <Protected>
+            <DonorCard />
+          </Protected>
+        ),
       },
     ],
   },

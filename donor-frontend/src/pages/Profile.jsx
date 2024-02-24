@@ -49,30 +49,13 @@ export default function Profile() {
         Персональные данные
         <div className="input_container">{contactDataList.join(", ")}</div>
       </label>
-      <label htmlFor="donor-card">
-        Карточка донора
-        <div className="input_container"></div>
-        {/* <input
-          id="donor-card"
-          type="text"
-          disabled
-          value={
-            (user.user.blood_group || "") +
-            " " +
-            (user.user.rh_factor || "") +
-            ", " +
-            "Kell-фактор" +
-            (user.user.kell_factor || "") +
-            "/n" +
-            "готов сдать " +
-            list_of_components.map((components) => components + ", ")
-          }
-        /> */}
-      </label>
+      <Link to="/donor-card">
+        <DonorButton text="Карточка донора" />
+      </Link>
       <label htmlFor="plan-donatation">
         Напомнить о донации
         <div className="input_container">
-          Укажите центр крови, планируемую дату и тип донации.За 3 дня до
+          Укажите центр крови, планируемую дату и тип донации. За 3 дня до
           намеченной даты мы пришлём напоминание на электронную почту.
         </div>
         {/* <input

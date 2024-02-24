@@ -194,3 +194,26 @@ p {
   padding: 0;
   margin: 0;
 }
+
+.readyToDonateItem {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0.3rem;
+  background-color: var(--tg-theme-secondary-bg-color);
+  border-radius: 0.4rem;
+  border: #ff2a23 solid 1px;
+  box-shadow: rgba(0, 0, 0, 0.1) 0px 4px 12px;
+}
+
+.ready {
+  border: #ff2a23 solid 3px;
+  font-weight: 700;
+  color: #ff2a23;
+}
+
+.donor-card-container {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 1rem;
+}
