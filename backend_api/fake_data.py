@@ -17,7 +17,7 @@ person = Person('en')
 internet = Internet()
 
 # Create 10 users
-for _ in range(10):
+for _ in range(500):
     gender = random.choice([Gender.MALE, Gender.FEMALE])
     user = User.objects.create(
         username=fake.user_name(),
