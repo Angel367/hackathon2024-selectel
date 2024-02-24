@@ -10,12 +10,12 @@ from mimesis import Internet
 os.environ.setdefault('DJANGO_SETTINGS_MODULE', 'backend_api.settings')
 django.setup()
 
-from backend_api_app.models import User, UserBonus, BonusFeedback, Donation, PlanDonation, Article, SpecialProject, UserEvent
+from backend_api_app.models import *
 
 fake = Faker()
 person = Person('en')
 internet = Internet()
-
+bloodStation_ids = BloodStation.objects.values_list('id', flat=True)
 # Create 10 users
 for _ in range(50):
     gender = random.choice([Gender.MALE, Gender.FEMALE])
@@ -45,6 +45,7 @@ for _ in range(50):
         ready_to_donate_erythrocytes=fake.boolean(),
         ready_to_donate_granulocytes=fake.boolean()
     )
+    user.set_password('12345678')
 
     # Create user bonuses
     for _ in range(250):
@@ -67,21 +68,23 @@ for _ in range(50):
 
     # Create donations
     for _ in range(250):
+        random_blood_station_id = random.choice(bloodStation_ids)
         Donation.objects.create(
             user=user,
             is_confirmed=fake.boolean(),
             donation_date=fake.date_time_this_year(),
-            blood_station_id=random.randint(1, 100),
+            blood_station=BloodStation.objects.get(id=random_blood_station_id),
             donation_type=random.choice(['blood', 'plasma', 'platelets', 'erythrocytes', 'granulocytes']),
             is_free=fake.boolean()
         )
 
     # Create plan donations
     for _ in range(250):
+        random_blood_station_id = random.choice(bloodStation_ids)
         PlanDonation.objects.create(
             user=user,
             donation_date=fake.date_time_this_year(),
-            blood_station_id=random.randint(1, 100),
+            blood_station=BloodStation.objects.get(id=random_blood_station_id),
             donation_type=random.choice(['blood', 'plasma', 'platelets', 'erythrocytes', 'granulocytes']),
             is_free=fake.boolean()
         )

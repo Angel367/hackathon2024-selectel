@@ -70,17 +70,19 @@ class City(models.Model):
 
 
 class Schedule(models.Model):
+    bloodStation = models.ForeignKey('BloodStation', on_delete=models.CASCADE)
     dow = models.CharField(max_length=20)
     start = models.TimeField()
     end = models.TimeField()
 
 
 class PhoneNumber(models.Model):
+    bloodStation = models.ForeignKey('BloodStation', on_delete=models.CASCADE)
     phone = models.CharField(max_length=20)
     comment = models.CharField(max_length=100, blank=True)
 
 
-class DonationCenter(models.Model):
+class BloodStation(models.Model):
     city = models.ForeignKey(City, on_delete=models.CASCADE)
     has_blood_group = models.BooleanField(default=False)
     lat = models.FloatField()
@@ -112,6 +114,14 @@ class DonationCenter(models.Model):
     for_moscow = models.BooleanField(default=False)
     closed = models.BooleanField(default=False)
     priority = models.IntegerField()
+
+    @classmethod
+    def get_field_names(cls):
+        """
+        Возвращает список имен полей модели
+        :return:
+        """
+        return [field.name for field in cls._meta.fields]
 
 
 
@@ -270,7 +280,7 @@ class Donation(models.Model):
     user = models.ForeignKey(User, on_delete=models.CASCADE)
     is_confirmed = models.BooleanField(default=False)
     donation_date = models.DateTimeField()
-    blood_station_id = models.IntegerField()
+    blood_station = models.ForeignKey(BloodStation, on_delete=models.CASCADE)
     donation_type = models.CharField(max_length=20, choices=DONATION_TYPES_CHOICES, null=False, blank=False,
                                      default='blood')
     is_free = models.BooleanField(default=True)
@@ -282,7 +292,7 @@ class PlanDonation(models.Model):
     """
     user = models.ForeignKey(User, on_delete=models.CASCADE)
     donation_date = models.DateTimeField()
-    blood_station_id = models.IntegerField()
+    blood_station = models.ForeignKey(BloodStation, on_delete=models.CASCADE)
     donation_type = models.CharField(max_length=20, default='blood', choices=DONATION_TYPES_CHOICES)
     is_free = models.BooleanField(default=True)
 

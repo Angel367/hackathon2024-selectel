@@ -44,7 +44,7 @@ export const readBloodStationWithoutCity = async (user, page ) => {
 
 };
 
-export const readBloodStationById = async (user, id_blood_station ) => {
+export const readBloodStationById = async ( id_blood_station ) => {
   const userToken = localStorage.getItem("user").token;
   const blood_stations = await axios.get(
     `https://hackaton.donorsearch.org/api/blood_stations/${id_blood_station}/`,

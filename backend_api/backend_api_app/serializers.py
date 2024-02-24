@@ -5,8 +5,7 @@ import re
 
 from django.contrib.auth import authenticate
 from rest_framework import serializers
-from .models import Donation, PlanDonation, UserBonus, Article, SpecialProject, BonusFeedback
-from .models import User
+from .models import *
 
 
 class RegistrationSerializer(serializers.ModelSerializer):
@@ -254,45 +253,6 @@ class UserSerializer(serializers.ModelSerializer):
         return instance
 
 
-class MyDonationSerializer(serializers.ModelSerializer):
-    """
-    Сериализация пожертвований пользователя.
-    """
-    def update(self, instance, validated_data):
-        """
-        Обновление данных пожертвования.
-        :param instance:
-        :param validated_data:
-        :return:
-        """
-        validated_data.pop('is_confirmed', None)
-        for key, value in validated_data.items():
-            if value == '' or value is None:
-                continue
-            setattr(instance, key, value)
-        instance.save()
-        return instance
-
-    class Meta:
-        """
-        Мета-класс для сериализатора MyDonationSerializer.
-        """
-        model = Donation
-        fields = '__all__'  # This will include all fields from the Donation model
-
-
-class UserPlanDonationSerializer(serializers.ModelSerializer):
-    """
-    Сериализация планов пожертвований пользователя.
-    """
-    class Meta:
-        """
-        Мета-класс для сериализатора UserPlanDonationSerializer.
-        """
-        model = PlanDonation
-        fields = '__all__'  # This will include all fields from the PlanDonation model
-
-
 class DonationForTopSerializer(serializers.ModelSerializer):
     """
     Сериализация пожертвований для топа.
@@ -303,6 +263,7 @@ class DonationForTopSerializer(serializers.ModelSerializer):
         """
         model = Donation
         fields = '__all__'  # This will include all fields from the Donation model
+        depth = 4
 
 
 class BonusFeedbackSerializer(serializers.ModelSerializer):
@@ -339,3 +300,134 @@ class SpecialProjectSerializer(serializers.ModelSerializer):
         """
         model = SpecialProject
         fields = '__all__'
+
+
+class CitySerializer(serializers.ModelSerializer):
+    """
+    Сериализация городов.
+    """
+    class Meta:
+        """
+        Мета-класс для сериализатора CitySerializer.
+        """
+        model = City
+        fields = '__all__'
+
+class ScheduleSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Schedule
+        fields = ('id', 'dow', 'start', 'end')
+
+
+class PhoneNumberSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = PhoneNumber
+        fields = ('id', 'phone', 'comment')
+
+class BloodStationSerializer(serializers.ModelSerializer):
+    schedules = serializers.SerializerMethodField()
+    phone_numbers = serializers.SerializerMethodField()
+
+    class Meta:
+        model = BloodStation
+        fields = ('id', 'city', 'has_blood_group', 'lat', 'lng', 'blood_status',
+                  'title', 'parser_url', 'is_get_from_parser', 'o_plus', 'o_minus',
+                  'a_plus', 'a_minus', 'b_plus', 'b_minus', 'ab_plus', 'ab_minus',
+                  'blood', 'plasma', 'platelets', 'erythrocytes', 'leukocytes',
+                  'address', 'site', 'phones', 'email', 'worktime',
+                  'without_registration', 'with_typing', 'for_moscow', 'closed',
+                  'priority', 'schedules', 'phone_numbers')
+
+    def get_schedules(self, obj):
+        schedules = obj.schedule_set.all()  # Assuming "schedule_set" is the related name
+        serializer = ScheduleSerializer(schedules, many=True)
+        return serializer.data
+
+    def get_phone_numbers(self, obj):
+        phone_numbers = obj.phonenumber_set.all()  # Assuming "phonenumber_set" is the related name
+        serializer = PhoneNumberSerializer(phone_numbers, many=True)
+        return serializer.data
+
+
+class MyDonationSerializer(serializers.ModelSerializer):
+    """
+    Сериализация пожертвований пользователя.
+    """
+    def update(self, instance, validated_data):
+        """
+        Обновление данных пожертвования.
+        :param instance:
+        :param validated_data:
+        :return:
+        """
+        validated_data.pop('is_confirmed', None)
+        for key, value in validated_data.items():
+            if value == '' or value is None:
+                continue
+            setattr(instance, key, value)
+        instance.save()
+        return instance
+
+    def to_representation(self, instance):
+        request = self.context.get('request')
+        representation = super().to_representation(instance)
+        if request and request.method == 'POST':
+            blood_station_id = representation.get('blood_station')
+            blood_station = BloodStation.objects.get(id=blood_station_id)
+            representation['blood_station'] = BloodStationSerializer(blood_station).data
+        else:
+            representation['blood_station'] = BloodStationSerializer(instance.blood_station).data
+        return representation
+
+    class Meta:
+        model = Donation
+        fields = ['token', 'donation_date', 'blood_station', 'donation_type']
+
+    class Meta:
+        """
+        Мета-класс для сериализатора MyDonationSerializer.
+        """
+        model = Donation
+        fields = '__all__'  # This will include all fields from the Donation model
+
+
+class UserPlanDonationSerializer(serializers.ModelSerializer):
+    """
+    Сериализация пожертвований пользователя.
+    """
+    def update(self, instance, validated_data):
+        """
+        Обновление данных пожертвования.
+        :param instance:
+        :param validated_data:
+        :return:
+        """
+        validated_data.pop('is_confirmed', None)
+        for key, value in validated_data.items():
+            if value == '' or value is None:
+                continue
+            setattr(instance, key, value)
+        instance.save()
+        return instance
+
+    def to_representation(self, instance):
+        request = self.context.get('request')
+        representation = super().to_representation(instance)
+        if request and request.method == 'POST':
+            blood_station_id = representation.get('blood_station')
+            blood_station = BloodStation.objects.get(id=blood_station_id)
+            representation['blood_station'] = BloodStationSerializer(blood_station).data
+        else:
+            representation['blood_station'] = BloodStationSerializer(instance.blood_station).data
+        return representation
+
+    class Meta:
+        model = PlanDonation
+        fields = '__all__'
+
+    class Meta:
+        """
+        Мета-класс для сериализатора MyDonationSerializer.
+        """
+        model = Donation
+        fields = '__all__'  # This will include all fields from the Donation model
