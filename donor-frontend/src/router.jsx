@@ -7,6 +7,7 @@ import NotFound from "./pages/NotFound.jsx";
 import Register from "./pages/Register.jsx";
 import Login from "./pages/Login.jsx";
 import DonorsTop100 from "./pages/DonorsTop100.jsx";
+import Menu from "./pages/Menu.jsx";
 export const router = createBrowserRouter([
   {
     path: "/",
@@ -32,6 +33,10 @@ export const router = createBrowserRouter([
       {
         path: "/top",
         element: <DonorsTop100 />,
+      },
+      {
+        path: "/menu",
+        element: <Menu />,
       },
       {
         path: "*",

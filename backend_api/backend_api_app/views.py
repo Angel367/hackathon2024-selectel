@@ -1,3 +1,5 @@
+from datetime import datetime
+
 from django.db.models import Q
 from django.http import JsonResponse
 from rest_framework import status, viewsets
@@ -172,11 +174,12 @@ class MainUserAPIView(APIView):
         user = request.user
         data = UserSerializer(user).data
         donor_card = DonorCardSerializer(user).data
+        plan_donation_last = PlanDonation.objects.filter(user=user, date__gte=datetime.now()).order_by('date').first()
         donor_card.pop('token')
         data.update({
             "donor_card": donor_card,
             "donations": MyDonationSerializer(Donation.objects.filter(user=user), many=True).data,
-            "plan_donations": UserPlanDonationSerializer(PlanDonation.objects.filter(user=user), many=True).data,
+            "plan_donation_last": plan_donation_last,
             "count_donations_all": Donation.objects.filter(user=user).count(),
             "count_donations_plasma": Donation.objects.filter(user=user, donation_type='plasma').count(),
             "count_donations_blood": Donation.objects.filter(user=user, donation_type='blood').count(),

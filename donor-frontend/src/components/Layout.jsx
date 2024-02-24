@@ -10,13 +10,18 @@ function Layout() {
             <img src="/drops.svg" />
           </div>
         </Link>
-        {user && (
-          <Link to={`/users/${user.user.username}`}>
-            <img src="/user.svg" width={50} height={50} />
-          </Link>
-        )}
       </div>
       <Outlet />
+      <div className="footer">
+        {user && (
+          <Link to={`/users/${user.user.username}`}>
+            <img src="/user.svg" width={70} height={70} />
+          </Link>
+        )}
+        <Link to="/menu">
+          <img src="/menu.svg" width={60} height={60} />
+        </Link>
+      </div>
     </div>
   );
 }
