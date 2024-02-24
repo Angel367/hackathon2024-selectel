@@ -121,6 +121,8 @@ class DonorCardSerializer(serializers.ModelSerializer):
 
     def update(self, instance, validated_data):
         for key, value in validated_data.items():
+            if value == '' or value is None:
+                continue
             # print(key, value)
             setattr(instance, key, value)
         instance.save()
@@ -152,8 +154,8 @@ class UserSerializer(serializers.ModelSerializer):
                   'token', 'id', 'phone_number', 'first_name',
                   'last_name', 'middle_name', 'birth_date', 'gender', 'about',
                   'is_email_verified', 'is_phone_verified', 'kell_factor', 'blood_group', 'rh_factor',
-                    'donor_status_name', 'has_donor_certificate', 'ready_to_donate_blood', 'ready_to_donate_plasma',
-                    'ready_to_donate_platelets', 'ready_to_donate_erythrocytes', 'ready_to_donate_granulocytes',
+                  'donor_status_name', 'has_donor_certificate', 'ready_to_donate_blood', 'ready_to_donate_plasma',
+                  'ready_to_donate_platelets', 'ready_to_donate_erythrocytes', 'ready_to_donate_granulocytes',
                   'old_password', 'new_password']
         read_only_fields = ['token']
 
@@ -161,6 +163,8 @@ class UserSerializer(serializers.ModelSerializer):
         old_password = validated_data.pop('old_password', None)
         new_password = validated_data.pop('new_password', None)
         for key, value in validated_data.items():
+            if value == '' or value is None:
+                continue
             if key == 'email':
                 if User.objects.filter(email=value).exists():
                     if User.objects.filter(email=value).first().id != instance.id:
@@ -195,6 +199,8 @@ class MyDonationSerializer(serializers.ModelSerializer):
     def update(self, instance, validated_data):
         validated_data.pop('is_confirmed', None)
         for key, value in validated_data.items():
+            if value == '' or value is None:
+                continue
             setattr(instance, key, value)
         instance.save()
         return instance
