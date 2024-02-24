@@ -4,7 +4,7 @@ export const readUser = async () => {
   return await axios.put(
     "https://donorsearchorg.ru/api/user/main/",
     {
-      token: "token " + userToken,
+      token: "token " + token,
     },
     {
       headers: {
