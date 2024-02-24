@@ -185,7 +185,7 @@ class UserSerializer(serializers.ModelSerializer):
                 raise serializers.ValidationError(
                     'Old password is incorrect.'
                 )
-        else:
+        if old_password is not None and new_password is not None:
             instance.set_password(new_password)
         instance.save()
         return instance

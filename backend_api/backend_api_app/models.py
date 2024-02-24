@@ -106,7 +106,7 @@ class User(AbstractBaseUser, PermissionsMixin):
     last_name = models.CharField(max_length=25, null=True)
     middle_name = models.CharField(max_length=25, null=True)
     birth_date = models.DateField(null=True)
-    gender = models.CharField(choices=GENDER_CHOICES, max_length=10, null=True, default='Unknown')
+    gender = models.CharField(choices=GENDER_CHOICES, max_length=10, null=True, default='unknown')
     about = models.TextField(null=True, blank=True, max_length=500)
 
     is_email_verified = models.BooleanField(default=False)
