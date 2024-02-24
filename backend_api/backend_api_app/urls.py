@@ -1,3 +1,6 @@
+"""
+This file is used to define the urls for the backend_api_app.
+"""
 from django.urls import path, include
 
 from .views import *

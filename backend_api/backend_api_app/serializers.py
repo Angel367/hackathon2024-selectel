@@ -1,3 +1,6 @@
+"""
+Сериализаторы для моделей User, Donation, PlanDonation, UserBonus, Article, SpecialProject, BonusFeedback
+"""
 import re
 
 from django.contrib.auth import authenticate
@@ -19,12 +22,20 @@ class RegistrationSerializer(serializers.ModelSerializer):
     token = serializers.CharField(max_length=255, read_only=True)
 
     class Meta:
+        """
+        Мета-класс для сериализатора RegistrationSerializer.
+        """
         model = User
         # Перечислить все поля, которые могут быть включены в запрос
         # или ответ, включая поля, явно указанные выше.
         fields = ['email', 'username', 'phone_number', 'password', 'token', 'id']
 
     def validate(self, data):
+        """
+        Проверка данных, предоставленных пользователем.
+        :param data:
+        :return:
+        """
         username = data.get('username', None)
         phone_pattern = r'^(?:\+7|8)\s?\(?\d{3}\)?[\s.-]?\d{3}[\s.-]?\d{2}[\s.-]?\d{2}$'
         email_pattern = r'^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$'
@@ -52,10 +63,18 @@ class RegistrationSerializer(serializers.ModelSerializer):
         return data
 
     def create(self, validated_data):
+        """
+        Создание нового пользователя.
+        :param validated_data:
+        :return:
+        """
         return User.objects.create_user(**validated_data)
 
 
 class LoginSerializer(serializers.Serializer):
+    """
+    Сериализация входа пользователя в систему.
+    """
     username = serializers.CharField(max_length=255, required=False)
     password = serializers.CharField(max_length=128, write_only=True)
     phone_number = serializers.CharField(max_length=10, required=False)
@@ -64,6 +83,11 @@ class LoginSerializer(serializers.Serializer):
     email = serializers.EmailField(max_length=255, required=False)
 
     def validate(self, data):
+        """
+        Проверка данных, предоставленных пользователем.
+        :param data:
+        :return:
+        """
         username = data.get('username', None)
         phone_pattern = r'^(?:\+7|8)\s?\(?\d{3}\)?[\s.-]?\d{3}[\s.-]?\d{2}[\s.-]?\d{2}$'
         email_pattern = r'^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$'
@@ -107,13 +131,25 @@ class LoginSerializer(serializers.Serializer):
 
 
 class UserBonusSerializer(serializers.ModelSerializer):
+    """
+    Сериализация бонусов пользователя.
+    """
     class Meta:
+        """
+        Мета-класс для сериализатора UserBonusSerializer.
+        """
         model = UserBonus
         fields = ['bonus_id', 'date_expired', 'date_received']
 
 
 class DonorCardSerializer(serializers.ModelSerializer):
+    """
+    Сериализация карточки донора.
+    """
     class Meta:
+        """
+        Мета-класс для сериализатора DonorCardSerializer.
+        """
         model = User
         read_only_fields = ['token']
         fields = ['token', 'ready_to_donate_blood',
@@ -125,6 +161,12 @@ class DonorCardSerializer(serializers.ModelSerializer):
                   'blood_group', 'id']
 
     def update(self, instance, validated_data):
+        """
+        Обновление данных карточки донора.
+        :param instance:
+        :param validated_data:
+        :return:
+        """
         for key, value in validated_data.items():
             if value == '' or value is None:
                 continue
@@ -135,6 +177,9 @@ class DonorCardSerializer(serializers.ModelSerializer):
 
 
 class UserSerializer(serializers.ModelSerializer):
+    """
+    Сериализация пользователя.
+    """
     password = serializers.CharField(
         max_length=128,
         min_length=8,
@@ -154,6 +199,9 @@ class UserSerializer(serializers.ModelSerializer):
     )
 
     class Meta:
+        """
+        Мета-класс для сериализатора UserSerializer.
+        """
         model = User
         fields = ['email', 'username', 'password',
                   'token', 'id', 'phone_number', 'first_name',
@@ -165,6 +213,12 @@ class UserSerializer(serializers.ModelSerializer):
         read_only_fields = ['token']
 
     def update(self, instance, validated_data):
+        """
+        Обновление данных пользователя.
+        :param instance:
+        :param validated_data:
+        :return:
+        """
         old_password = validated_data.pop('old_password', None)
         new_password = validated_data.pop('new_password', None)
         for key, value in validated_data.items():
@@ -201,7 +255,16 @@ class UserSerializer(serializers.ModelSerializer):
 
 
 class MyDonationSerializer(serializers.ModelSerializer):
+    """
+    Сериализация пожертвований пользователя.
+    """
     def update(self, instance, validated_data):
+        """
+        Обновление данных пожертвования.
+        :param instance:
+        :param validated_data:
+        :return:
+        """
         validated_data.pop('is_confirmed', None)
         for key, value in validated_data.items():
             if value == '' or value is None:
@@ -211,36 +274,68 @@ class MyDonationSerializer(serializers.ModelSerializer):
         return instance
 
     class Meta:
+        """
+        Мета-класс для сериализатора MyDonationSerializer.
+        """
         model = Donation
         fields = '__all__'  # This will include all fields from the Donation model
 
 
 class UserPlanDonationSerializer(serializers.ModelSerializer):
+    """
+    Сериализация планов пожертвований пользователя.
+    """
     class Meta:
+        """
+        Мета-класс для сериализатора UserPlanDonationSerializer.
+        """
         model = PlanDonation
         fields = '__all__'  # This will include all fields from the PlanDonation model
 
 
 class DonationForTopSerializer(serializers.ModelSerializer):
+    """
+    Сериализация пожертвований для топа.
+    """
     class Meta:
+        """
+        Мета-класс для сериализатора DonationForTopSerializer.
+        """
         model = Donation
         fields = '__all__'  # This will include all fields from the Donation model
 
 
 class BonusFeedbackSerializer(serializers.ModelSerializer):
+    """
+    Сериализация отзывов о бонусах.
+    """
     class Meta:
+        """
+        Мета-класс для сериализатора BonusFeedbackSerializer.
+        """
         model = BonusFeedback
         fields = '__all__'  # This will include all fields from the UserBonus model
 
 
 class ArticleSerializer(serializers.ModelSerializer):
+    """
+    Сериализация статей.
+    """
     class Meta:
+        """
+        Мета-класс для сериализатора ArticleSerializer.
+        """
         model = Article
         fields = '__all__'
 
 
 class SpecialProjectSerializer(serializers.ModelSerializer):
+    """
+    Сериализация специальных проектов.
+    """
     class Meta:
+        """
+        Мета-класс для сериализатора SpecialProjectSerializer.
+        """
         model = SpecialProject
         fields = '__all__'
-
