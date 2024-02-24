@@ -9,6 +9,9 @@ import Login from "./pages/Login.jsx";
 import DonorsTop100 from "./pages/DonorsTop100.jsx";
 import Menu from "./pages/Menu.jsx";
 import EditProfile from "./pages/EditProfile.jsx";
+import DonationList from "./pages/Donation/DonationList.jsx";
+import Donation from "./pages/Donation/Donation.jsx";
+import DonationCreate from "./pages/Donation/DonationCreate.jsx";
 export const router = createBrowserRouter([
   {
     path: "/",
@@ -28,12 +31,36 @@ export const router = createBrowserRouter([
         ),
       },
       {
+        path: "/users/:username/donations",
+        element:(
+          <Protected>
+            <DonationList/>
+            </Protected>
+        )
+      },
+        {
+        path: "/users/:username/donations/create",
+        element:(
+          <Protected>
+            <DonationCreate/>
+            </Protected>
+        )
+      },
+        {
+        path: "/users/:username/donations/:id",
+        element:(
+          <Protected>
+            <Donation/>
+            </Protected>
+        )
+      },
+      {
         path: "/register",
-        element: <Register />,
+        element: <Register/>,
       },
       {
         path: "/login",
-        element: <Login />,
+        element: <Login/>,
       },
       {
         path: "/top",
