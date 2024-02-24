@@ -20,12 +20,10 @@ function EditProfile() {
       rh_factor: "Unknown",
       kell_factor: "Unknown",
       blood_group: "Unknown",
-      gender: "Unknown",
+      gender: "unknown",
     },
   });
-  const navigate = useNavigate();
   const onSubmit = async (data) => {
-    console.log(data);
     let userData;
     try {
       userData = await editUser(data);
@@ -36,7 +34,7 @@ function EditProfile() {
           arrayErrors.forEach((error) => {
             toast.error(error, {
               position: "top-right",
-              autoClose: 5000,
+              autoClose: 2000,
               hideProgressBar: false,
               closeOnClick: true,
               pauseOnHover: true,
@@ -48,7 +46,7 @@ function EditProfile() {
       } else {
         toast.error(err.message, {
           position: "top-right",
-          autoClose: 5000,
+          autoClose: 2000,
           hideProgressBar: false,
           closeOnClick: true,
           pauseOnHover: true,
@@ -58,8 +56,15 @@ function EditProfile() {
       }
     }
     setUser(userData.data);
-    navigate(`/users/${userData.data.user.username}`);
-    location.reload();
+    toast.success("Профиль успешно обновлен", {
+      position: "top-right",
+      autoClose: 2000,
+      hideProgressBar: false,
+      closeOnClick: true,
+      pauseOnHover: true,
+      draggable: true,
+      theme: "dark",
+    });
   };
   return (
     <div>
@@ -70,229 +75,127 @@ function EditProfile() {
           onSubmit(data);
         })}
       >
-        <label htmlFor="email">
+        <label>
           Электронная почта
-          <input
-            type="email"
-            id="email"
-            placeholder="Почта"
-            {...register("email")}
-          />
+          <input type="email" placeholder="Почта" {...register("email")} />
         </label>
-        <label htmlFor="phone">
+        <label>
           Телефон
           <input
             type="text"
-            id="phone"
             placeholder="Номер телефона"
             {...register("phone_number")}
           />
         </label>
-        <label htmlFor="first_name">
+        <label>
           Имя
           <input
             type="text"
-            id="first_name"
             placeholder="Ваше имя"
             {...register("first_name")}
           />
         </label>
-        <label htmlFor="last_name">
+        <label>
           Фамилия
           <input
             type="text"
-            id="last_name"
             placeholder="Ваша фамилия"
             {...register("last_name")}
           />
         </label>
-        <label htmlFor="middle_name">
+        <label>
           Отчество
           <input
             type="text"
-            id="middle_name"
             placeholder="Ваше отчество"
             {...register("middle_name")}
           />
         </label>
-        <label htmlFor="birth_date">
+        <label>
           Дата рождения
-          <input type="date" id="birth_date" {...register("birth_date")} />
+          <input type="date" {...register("birth_date")} />
         </label>
-        <label htmlFor="gender">
+        <div className="input_container">
           Пол
-          <div className="input_container">
-            <label htmlFor="male">
-              <input
-                type="radio"
-                id="male"
-                {...register("gender")}
-                name="gender"
-                value="male"
-              />
-              Мужской
-            </label>
-            <label htmlFor="female">
-              <input
-                type="radio"
-                id="female"
-                {...register("gender")}
-                name="gender"
-                value="female"
-              />
-              Женский
-            </label>
-            <label htmlFor="unknown">
-              <input
-                type="radio"
-                id="female"
-                {...register("gender")}
-                name="gender"
-                value="unknown"
-                checked
-              />
-              Неизвестно
-            </label>
-          </div>
-        </label>
-
-        <label htmlFor="about">
+          <label>
+            <input type="radio" {...register("gender")} value="male" />
+            Мужской
+          </label>
+          <label>
+            <input type="radio" {...register("gender")} value="female" />
+            Женский
+          </label>
+          <label>
+            <input
+              type="radio"
+              {...register("gender")}
+              value="unknown"
+              checked
+            />
+            Неизвестно
+          </label>
+        </div>
+        <label>
           Описание профиля
           <input
             type="text"
-            id="about"
             placeholder="Описание профиля"
             {...register("about")}
           />
         </label>
-        <label htmlFor="kell_factor">
+
+        <div className="input_container">
           Kell-фактор
-          <div className="input_container">
-            <label htmlFor="Positive">
-              <input
-                type="radio"
-                id="Positive"
-                {...register("kell_factor")}
-                name="kell_factor"
-                value="Positive"
-              />
-              Положительный
-            </label>
-            <label htmlFor="Negative">
-              <input
-                type="radio"
-                id="Negative"
-                {...register("kell_factor")}
-                name="kell_factor"
-                value="Negative"
-              />
-              Отрицательный
-            </label>
-            <label htmlFor="unknown">
-              <input
-                type="radio"
-                id="Unknown"
-                {...register("kell_factor")}
-                name="kell_factor"
-                value="Unknown"
-                checked
-              />
-              Неизвестно
-            </label>
-          </div>
-        </label>
-        <label htmlFor="blood_group">
+          <label>
+            <input type="radio" {...register("kell_factor")} value="Positive" />
+            Положительный
+          </label>
+          <label>
+            <input type="radio" {...register("kell_factor")} value="Negative" />
+            Отрицательный
+          </label>
+          <label>
+            <input type="radio" {...register("kell_factor")} value="Unknown" />
+            Неизвестно
+          </label>
+        </div>
+
+        <div className="input_container">
           Группа крови
-          <div className="input_container">
-            <label htmlFor="A">
-              <input
-                type="radio"
-                id="A"
-                {...register("blood_group")}
-                name="blood_group"
-                value="A"
-              />
-              A
-            </label>
-            <label htmlFor="B">
-              <input
-                type="radio"
-                id="B"
-                {...register("blood_group")}
-                name="blood_group"
-                value="B"
-              />
-              B
-            </label>
-            <label htmlFor="AB">
-              <input
-                type="radio"
-                id="AB"
-                {...register("blood_group")}
-                name="blood_group"
-                value="AB"
-              />
-              AB
-            </label>
-            <label htmlFor="O">
-              <input
-                type="radio"
-                id="O"
-                {...register("blood_group")}
-                name="blood_group"
-                value="O"
-              />
-              O
-            </label>
-            <label htmlFor="Unknown">
-              <input
-                type="radio"
-                id="Unknown"
-                {...register("blood_group")}
-                name="blood_group"
-                value="Unknown"
-                checked
-              />
-              Неизвестно
-            </label>
-          </div>
-        </label>
-        <label htmlFor="rh_factor">
+          <label>
+            <input type="radio" {...register("blood_group")} value="A" />A
+          </label>
+          <label>
+            <input type="radio" {...register("blood_group")} value="B" />B
+          </label>
+          <label>
+            <input type="radio" {...register("blood_group")} value="AB" />
+            AB
+          </label>
+          <label>
+            <input type="radio" {...register("blood_group")} value="O" />O
+          </label>
+          <label>
+            <input type="radio" {...register("blood_group")} value="Unknown" />
+            Неизвестно
+          </label>
+        </div>
+
+        <div className="input_container">
           Резус-фактор
-          <div className="input_container">
-            <label htmlFor="Positive">
-              <input
-                type="radio"
-                id="Positive"
-                {...register("rh_factor")}
-                name="rh_factor"
-                value="Positive"
-              />
-              Положительный
-            </label>
-            <label htmlFor="Negative">
-              <input
-                type="radio"
-                id="Negative"
-                {...register("rh_factor")}
-                name="rh_factor"
-                value="Negative"
-              />
-              Отрицательный
-            </label>
-            <label htmlFor="unknown">
-              <input
-                type="radio"
-                id="Unknown"
-                {...register("rh_factor")}
-                name="rh_factor"
-                value="Unknown"
-                checked
-              />
-              Неизвестно
-            </label>
-          </div>
-        </label>
+          <label>
+            <input type="radio" {...register("rh_factor")} value="Positive" />
+            Положительный
+          </label>
+          <label>
+            <input type="radio" {...register("rh_factor")} value="Negative" />
+            Отрицательный
+          </label>
+          <label>
+            <input type="radio" {...register("rh_factor")} value="Unknown" />
+            Неизвестно
+          </label>
+        </div>
 
         <DonorButton type="submit" text="Сохранить изменения" />
       </form>
