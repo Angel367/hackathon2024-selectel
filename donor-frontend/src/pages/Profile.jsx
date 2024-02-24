@@ -7,7 +7,26 @@ export default function Profile() {
   const navigate = useNavigate();
   const { username } = useParams();
   const user = JSON.parse(localStorage.getItem("user"));
-  let list_of_components = [];
+
+
+
+  let donorInfo;
+  useEffect(() => {
+    const getDonorInfo = async () => {
+      donorInfo = await readUser(username);
+    };
+
+    getDonorInfo();
+  }, []);
+ console.log(donorInfo);
+  const contactDataList = [
+    donorInfo.email,
+    donorInfo.user.phone_number,
+    user.user.first_name + " " + user.user.middle_name + " " + user.user.last_name,
+  ];
+
+  console.log(donorInfo);
+    let list_of_components = [];
   if (user.user.ready_to_donate_blood) {
     list_of_components.push("цельную кровь");
   }
@@ -23,28 +42,10 @@ export default function Profile() {
   if (user.user.ready_to_donate_plasma) {
     list_of_components.push("плазму");
   }
-
-  const contactDataList = [
-    user.user.email,
-    user.user.phone_number,
-    user.user.first_name + " " + user.user.last_name,
-  ];
-
-  let donorInfo;
-  useEffect(() => {
-    const getDonorInfo = async () => {
-      donorInfo = await readUser(username);
-    };
-
-    getDonorInfo();
-  }, []);
-
-  console.log(donorInfo);
-
   return (
     <div className="container">
-      <h4>{username}</h4>
-      {/*<h4>{(user.user.first_name || "")+ " " + (user.user.last_name || "")}</h4>*/}
+      {/*<h4>{username}</h4>*/}
+      <h4>{(user.user.first_name || "")+ " " + (user.user.last_name || "")}</h4>
       <label htmlFor="contacts">
         Персональные данные
         <div className="input_container">{contactDataList.join(", ")}</div>

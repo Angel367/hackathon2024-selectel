@@ -1,6 +1,6 @@
 import axios from "axios";
 export const readUser = async () => {
-  const userToken = localStorage.getItem("user").token;
+  const userToken = localStorage.getItem("user").user.token;
   console.log(userToken);
   return await axios.get(
     "https://donorsearchorg.ru/api/user/main/",
