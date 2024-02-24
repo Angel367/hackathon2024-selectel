@@ -339,7 +339,7 @@ class DonationTopApiView(APIView):
 
                 user_donations[user_id] = {
                     'user_id': user_id,
-                    'name_to_display': user.first_name + user.last_name,
+                    'name_to_display': user.first_name + ' ' + user.last_name,
                     'value_to_display': value_to_display,
                     'donor_status_name': user.donor_status_name,
                     'total_amount': 0, 'plasma_amount': 0,
