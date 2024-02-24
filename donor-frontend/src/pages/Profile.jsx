@@ -2,6 +2,7 @@ import { useParams } from "react-router-dom";
 import DonorButton from "../components/DonorButton";
 import { useNavigate } from "react-router-dom";
 import { useEffect } from "react";
+import { readUser } from "../api/user_for_profile";
 export default function Profile() {
   const navigate = useNavigate();
   const { username } = useParams();
@@ -23,14 +24,22 @@ export default function Profile() {
     list_of_components.push("плазму");
   }
 
-  const contactDataList = [];
-  for (const [key, contact] of Object.entries(user.user)) {
-    if (key !== "token" && contact && key !== "id")
-      contactDataList.push(contact);
-  }
+  const contactDataList = [
+    user.user.email,
+    user.user.phone_number,
+    user.user.first_name + " " + user.user.last_name,
+  ];
 
-  const donorInfo = [];
-  useEffect(() => {});
+  let donorInfo;
+  useEffect(() => {
+    const getDonorInfo = async () => {
+      donorInfo = await readUser(username);
+    };
+
+    getDonorInfo();
+  }, []);
+
+  console.log(donorInfo);
 
   return (
     <div className="container">
@@ -63,9 +72,8 @@ export default function Profile() {
       <label htmlFor="plan-donatation">
         Напомнить о донации
         <div className="input_container">
-          {" "}
-          "Укажите центр крови, планируемую дату и тип донации." + " За 3 дня до
-          намеченной даты мы пришлём " + "напоминание на электронную почту."
+          Укажите центр крови, планируемую дату и тип донации.За 3 дня до
+          намеченной даты мы пришлём напоминание на электронную почту.
         </div>
         {/* <input
           id="plan-donatation"
