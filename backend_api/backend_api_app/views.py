@@ -320,8 +320,28 @@ class DonationTopApiView(APIView):
 
             # Initialize user entry if not exists
             if user_id not in user_donations:
+                user = User.objects.get(id=user_id)
+                value_to_display = ''
+                if user.blood_group == 'A':
+                    value_to_display += 'A (II)'
+                elif user.blood_group == 'B':
+                    value_to_display += 'B (III)'
+                elif user.blood_group == 'AB':
+                    value_to_display += 'AB (IV)'
+                elif user.blood_group == 'O':
+                    value_to_display += 'O (I)'
+
+                if user.rh_factor == 'Positive':
+                    value_to_display += ' Rh+'
+                elif user.rh_factor == 'Negative':
+                    value_to_display += ' Rh-'
+
                 user_donations[user_id] = {
-                    'user_id': user_id, 'total_amount': 0, 'plasma_amount': 0,
+                    'user_id': user_id,
+                    'name_to_display': user.first_name + user.last_name,
+                    'value_to_display': value_to_display,
+                    'donor_status_name': user.donor_status_name,
+                    'total_amount': 0, 'plasma_amount': 0,
                     'blood_amount': 0, 'platelets_amount': 0, 'erythrocytes_amount': 0, 'granulocytes_amount': 0
                 }
 
