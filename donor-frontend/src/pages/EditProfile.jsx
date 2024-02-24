@@ -8,7 +8,18 @@ import { editUser } from "../api/user";
 import { useForm } from "react-hook-form";
 
 function EditProfile() {
-  const { register, handleSubmit } = useForm();
+  const { register, handleSubmit } = useForm({
+    defaultValues: {
+      email: null,
+      username: null,
+      phone_number: null,
+      first_name: null,
+      last_name: null,
+      middle_name: null,
+      about: null,
+      birth_date: null,
+    },
+  });
   const navigate = useNavigate();
   const onSubmit = async (data) => {
     console.log(data);
@@ -144,6 +155,7 @@ function EditProfile() {
                 {...register("gender")}
                 name="gender"
                 value="unknown"
+                checked
               />
               Неизвестно
             </label>
@@ -189,6 +201,7 @@ function EditProfile() {
                 {...register("kell_factor")}
                 name="kell_factor"
                 value="Unknown"
+                checked
               />
               Неизвестно
             </label>
@@ -243,7 +256,8 @@ function EditProfile() {
                 id="Unknown"
                 {...register("blood_group")}
                 name="blood_group"
-                value="unknown"
+                value="Unknown"
+                checked
               />
               Неизвестно
             </label>
@@ -279,6 +293,7 @@ function EditProfile() {
                 {...register("rh_factor")}
                 name="rh_factor"
                 value="Unknown"
+                checked
               />
               Неизвестно
             </label>
@@ -287,12 +302,6 @@ function EditProfile() {
 
         <DonorButton type="submit" text="Сохранить изменения" />
       </form>
-      <div className="goTo">
-        <h5>Есть аккаунт?</h5>
-        <Link to="/login">
-          <h4>Войти</h4>
-        </Link>
-      </div>
       <ToastContainer />
     </div>
   );
