@@ -20,7 +20,7 @@ function EditProfile() {
       rh_factor: "Unknown",
       kell_factor: "Unknown",
       blood_group: "Unknown",
-      gender: "Unknown",
+      gender: "unknown",
     },
   });
   const navigate = useNavigate();
@@ -120,7 +120,12 @@ function EditProfile() {
             Женский
           </label>
           <label>
-            <input type="radio" {...register("gender")} value="unknown" />
+            <input
+              type="radio"
+              {...register("gender")}
+              value="unknown"
+              checked
+            />
             Неизвестно
           </label>
         </div>
