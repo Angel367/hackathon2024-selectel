@@ -2,10 +2,14 @@ import axios from "axios";
 export const readDonationList = async (user) => {
   const userToken = user.user.token;
   console.log("token" + userToken);
-  return await axios.get(
+  return await axios.post(
     "https://donorsearchorg.ru/api/user/donations/",
     {
         token: "token " + userToken,
+
+    list: true
+
+
     },
     {
       headers: {
@@ -16,12 +20,13 @@ export const readDonationList = async (user) => {
 }
 
 export const readDonation = async (user, id_donation) => {
-  const userToken = localStorage.getItem("user").token;
-  console.log(userToken);
+  const userToken = user.user.token;
+  // console.log(userToken);
   return await axios.put(
     `https://donorsearchorg.ru/api/user/donations/${id_donation}/`,
     {
         token: "token " + userToken,
+        id: id_donation
 
     },
     {
@@ -74,7 +79,7 @@ export const createDonation = async (user, donation) => {
 export const deleteDonation = async (user, id_donation) => {
   const userToken = localStorage.getItem("user").token;
   console.log(userToken);
-  return await axios.put(
+  return await axios.delete(
     `https://donorsearchorg.ru/api/user/donations/${id_donation}/`,
     {
         token: "token " + userToken
