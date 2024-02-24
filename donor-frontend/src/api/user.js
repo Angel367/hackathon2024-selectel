@@ -35,12 +35,12 @@ export const editUser = async (user) => {
   );
 };
 export const editUserDonorCard = async (user) => {
-  const userToken = localStorage.getItem("user").token;
+  const userToken = JSON.parse(localStorage.getItem("user")).user.token;
   console.log(userToken);
   return await axios.put(
     "https://donorsearchorg.ru/api/user/donor-card/",
       {
-
+        token: "token " + userToken,
         kell_factor: user.kell_factor,
         blood_group: user.blood_group,
         rh_factor: user.rh_factor,
