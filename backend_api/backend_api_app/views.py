@@ -264,13 +264,14 @@ class MainUserAPIView(APIView):
     permission_classes = (IsAuthenticated,)
     renderer_classes = (UserJSONRenderer,)
 
-    def get(self, request):
+    def put(self, request):
         """
         Получить все данные пользователя.
         :param request:
         :return:
         """
         user = request.user
+
         data = UserSerializer(user).data
         donor_card = DonorCardSerializer(user).data
         plan_donation_last = (PlanDonation.objects.filter(user=user, donation_date__gte=datetime.now())
