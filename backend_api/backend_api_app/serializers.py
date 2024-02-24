@@ -2,7 +2,7 @@ import re
 
 from django.contrib.auth import authenticate
 from rest_framework import serializers
-from .models import Donation, PlanDonation
+from .models import Donation, PlanDonation, UserBonus, Article, SpecialProject, BonusFeedback
 from .models import User
 
 
@@ -106,39 +106,28 @@ class LoginSerializer(serializers.Serializer):
         }
 
 
+class UserBonusSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = UserBonus
+        fields = ['bonus_id', 'date_expired', 'date_received']
+
 
 class DonorCardSerializer(serializers.ModelSerializer):
-    token = serializers.CharField(max_length=255, read_only=True)
     class Meta:
         model = User
-        read_only_fields = ('token',)
-        fields = ['ready_to_donate_blood', 'ready_to_donate_granulocytes', 'ready_to_donate_platelets',
+        read_only_fields = ['token']
+        fields = ['token', 'ready_to_donate_blood', 'ready_to_donate_granulocytes', 'ready_to_donate_platelets',
                   'ready_to_donate_plasma', 'ready_to_donate_erythrocytes', 'kell_factor', 'blood_group', 'id']
 
     def update(self, instance, validated_data):
         for key, value in validated_data.items():
+            # print(key, value)
             setattr(instance, key, value)
         instance.save()
         return instance
 
 
-
-class AllDataUserSerializer(serializers.ModelSerializer):
-
-    class Meta:
-        model = User
-        read_only_fields = ('token')
-        exclude = ('password',  'is_active', 'is_staff', 'created_at',
-                   'updated_at', 'is_email_verified', 'is_phone_verified')
-
-
-
 class UserSerializer(serializers.ModelSerializer):
-    """ Ощуществляет сериализацию и десериализацию объектов User. """
-
-    # Пароль должен содержать от 8 до 128 символов. Это стандартное правило. Мы
-    # могли бы переопределить это по-своему, но это создаст лишнюю работу для
-    # нас, не добавляя реальных преимуществ, потому оставим все как есть.
     password = serializers.CharField(
         max_length=128,
         min_length=8,
@@ -164,15 +153,7 @@ class UserSerializer(serializers.ModelSerializer):
                   'last_name', 'middle_name', 'birth_date',
                   'is_email_verified', 'is_phone_verified',
                   'about', 'old_password', 'new_password']
-
-        # Параметр read_only_fields является альтернативой явному указанию поля
-        # с помощью read_only = True, как мы это делали для пароля выше.
-        # Причина, по которой мы хотим использовать здесь 'read_only_fields'
-        # состоит в том, что нам не нужно ничего указывать о поле. В поле
-        # пароля требуются свойства min_length и max_length,
-        # но это не относится к полю токена.
         read_only_fields = ['token']
-
 
     def update(self, instance, validated_data):
         old_password = validated_data.pop('old_password', None)
@@ -190,11 +171,7 @@ class UserSerializer(serializers.ModelSerializer):
                         raise serializers.ValidationError(
                             'A user with this phone number already exists.'
                         )
-
-            # Для ключей, оставшихся в validated_data мы устанавливаем значения
-            # в текущий экземпляр User по одному.
             setattr(instance, key, value)
-
         if old_password is None and new_password is not None:
             # 'set_password()' решает все вопросы, связанные с безопасностью
             # при обновлении пароля, потому нам не нужно беспокоиться об этом.
@@ -208,15 +185,18 @@ class UserSerializer(serializers.ModelSerializer):
                 )
         else:
             instance.set_password(new_password)
-
-        # После того, как все было обновлено, мы должны сохранить наш экземпляр
-        # User. Стоит отметить, что set_password() не сохраняет модель.
         instance.save()
-
         return instance
 
 
 class MyDonationSerializer(serializers.ModelSerializer):
+    def update(self, instance, validated_data):
+        validated_data.pop('is_confirmed', None)
+        for key, value in validated_data.items():
+            setattr(instance, key, value)
+        instance.save()
+        return instance
+
     class Meta:
         model = Donation
         fields = '__all__'  # This will include all fields from the Donation model
@@ -232,3 +212,22 @@ class DonationForTopSerializer(serializers.ModelSerializer):
     class Meta:
         model = Donation
         fields = '__all__'  # This will include all fields from the Donation model
+
+
+class BonusFeedbackSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = BonusFeedback
+        fields = '__all__'  # This will include all fields from the UserBonus model
+
+
+class ArticleSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Article
+        fields = '__all__'
+
+
+class SpecialProjectSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = SpecialProject
+        fields = '__all__'
+

@@ -1,16 +1,15 @@
-import json
-
+from django.db.models import Q
 from django.http import JsonResponse
-from rest_framework import status, viewsets, permissions
+from rest_framework import status, viewsets
 from rest_framework.decorators import action
 from rest_framework.generics import RetrieveUpdateAPIView
 from rest_framework.permissions import AllowAny, IsAuthenticated
 from rest_framework.response import Response
 from rest_framework.views import APIView
 
+from .models import Donation, PlanDonation, BonusFeedback
 from .renderers import UserJSONRenderer
 from .serializers import *
-from .models import Donation, PlanDonation
 
 
 class RegistrationAPIView(APIView):
@@ -56,7 +55,6 @@ class UserRetrieveUpdateAPIView(RetrieveUpdateAPIView):
         # сериализатор обрабатывал преобразования объекта User во что-то, что
         # можно привести к json и вернуть клиенту.
         serializer = self.serializer_class(request.user)
-
         return Response(serializer.data, status=status.HTTP_200_OK)
 
     def update(self, request, *args, **kwargs):
@@ -82,7 +80,7 @@ class DonorCardAPIView(RetrieveUpdateAPIView):
         return Response(serializer.data, status=status.HTTP_200_OK)
 
     def update(self, request, *args, **kwargs):
-        serializer_data = request.data.get('user', {})
+        serializer_data = request.data
 
         serializer = self.serializer_class(
             request.user, data=serializer_data, partial=True
@@ -92,19 +90,101 @@ class DonorCardAPIView(RetrieveUpdateAPIView):
         return Response(serializer.data, status=status.HTTP_200_OK)
 
 
-class AllDataAPIView(APIView):
-    # for all data (retrieve)
+class BonusFeedbackAPIView(viewsets.ViewSet):
+    # for bonus feedback (retrieve)
+    permission_classes = (IsAuthenticated,)
+    renderer_classes = (UserJSONRenderer,)
+
+    def list(self, request, bonus_id):
+        data = {
+            "feedback": BonusFeedbackSerializer(BonusFeedback.objects.filter(bonus_id=bonus_id), many=True).data
+        }
+        return Response(data, status=status.HTTP_200_OK)
+
+    def create(self, request, bonus_id):
+        user = request.user
+        data = request.data.copy()
+        data['user'] = user.id
+        data['bonus_id'] = bonus_id
+        serializer = BonusFeedbackSerializer(data=data)
+
+        if serializer.is_valid():
+            serializer.save()
+            return Response(serializer.data, status=status.HTTP_201_CREATED)
+        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
+    def retrieve(self, request, pk=None):  # Modify retrieve method to accept pk
+        try:
+            feedback = BonusFeedback.objects.get(pk=pk)
+        except BonusFeedback.DoesNotExist:
+            return Response(status=status.HTTP_404_NOT_FOUND)
+
+        serializer = BonusFeedbackSerializer(feedback)
+        return Response(serializer.data)
+
+    def update(self, request, bonus_id, pk=None):  # Add update method to handle PUT requests
+        pk = request.data.get('id')
+        user = request.user
+        data = request.data.copy()
+        data['user'] = user.id
+        data['bonus_id'] = bonus_id
+        try:
+            feedback = BonusFeedback.objects.get(pk=pk)
+        except BonusFeedback.DoesNotExist:
+            return Response(status=status.HTTP_404_NOT_FOUND)
+        serializer = BonusFeedbackSerializer(feedback, data=data)
+        if serializer.is_valid():
+            serializer.save()
+            return Response(serializer.data)
+        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
+    @action(detail=True, methods=['delete'])
+    def delete(self, request, bonus_id, pk=None):  # Modify delete method to accept pk
+        pk = request.data.get('id')
+        try:
+            feedback = BonusFeedback.objects.get(pk=pk)
+        except BonusFeedback.DoesNotExist:
+            return Response(status=status.HTTP_404_NOT_FOUND, data={"Сущность не найдена"})
+        feedback.delete()
+        return Response(status=status.HTTP_204_NO_CONTENT, data={"Успешно удалено"})
+
+
+
+class MyBonusAPIView(APIView):
+    # for bonus my (retrieve)
     permission_classes = (IsAuthenticated,)
     renderer_classes = (UserJSONRenderer,)
 
     def get(self, request):
         user = request.user
         data = {
-            "user": UserSerializer(user).data,
-            "donor_card": DonorCardSerializer(user).data,
-            "donations": MyDonationSerializer(Donation.objects.filter(user=user)).data,
-            "plan_donations": UserPlanDonationSerializer(PlanDonation.objects.filter(user=user)).data
+            "bonus": UserBonusSerializer(UserBonus.objects.filter(user=user), many=True).data
         }
+        return Response(data, status=status.HTTP_200_OK)
+
+
+class MainUserAPIView(APIView):
+    # for all data (retrieve)
+    permission_classes = (IsAuthenticated,)
+    renderer_classes = (UserJSONRenderer,)
+
+    def get(self, request):
+        user = request.user
+        data = UserSerializer(user).data
+        donor_card = DonorCardSerializer(user).data
+        donor_card.pop('token')
+        data.update({
+            "donor_card": donor_card,
+            "donations": MyDonationSerializer(Donation.objects.filter(user=user), many=True).data,
+            "plan_donations": UserPlanDonationSerializer(PlanDonation.objects.filter(user=user), many=True).data,
+            "count_donations_all": Donation.objects.filter(user=user).count(),
+            "count_donations_plasma": Donation.objects.filter(user=user, donation_type='plasma').count(),
+            "count_donations_blood": Donation.objects.filter(user=user, donation_type='blood').count(),
+            "count_donations_platelets": Donation.objects.filter(user=user, donation_type='platelets').count(),
+            "count_donations_eritrocytes": Donation.objects.filter(user=user, donation_type='eritrocytes').count(),
+            "count_donations_granulocytes": Donation.objects.filter(user=user, donation_type='granulocytes').count(),
+            "count_donations_is_free": Donation.objects.filter(user=user, is_free=True).count()
+        })
         return Response(data, status=status.HTTP_200_OK)
 
 
@@ -252,5 +332,46 @@ class DonationTopApiView(APIView):
         grouped_data = sorted(list(user_donations.values()), key=lambda x: x['total_amount'], reverse=True)
 
         return JsonResponse(grouped_data, status=status.HTTP_200_OK, content_type='application/json', safe=False)
+
+
+class ArticleViewSet(viewsets.ViewSet):
+    permission_classes = (AllowAny,)  # Требуется авторизация через токен
+
+    def list(self, request):
+        keywords = request.query_params.get('keywords', None)
+        if keywords is not None:
+            articles = (Article.objects.filter(is_active=True)
+                        .filter(Q(text__icontains=keywords) | Q(title__icontains=keywords)))
+        else:
+            articles = Article.objects.filter(is_active=True)
+        serializer = ArticleSerializer(articles, many=True)
+        return Response(serializer.data)
+
+    def retrieve(self, request, pk=None):  # Modify retrieve method to accept pk
+        try:
+            article = Article.objects.get(pk=pk)
+        except Article.DoesNotExist:
+            return Response(status=status.HTTP_404_NOT_FOUND)
+
+        serializer = ArticleSerializer(article)
+        return Response(serializer.data)
+
+
+class SpecialProjectViewSet(viewsets.ViewSet):
+    permission_classes = (AllowAny,)  # Требуется авторизация через токен
+
+    def list(self, request):
+        special_projects = SpecialProject.objects.filter(is_active=True)
+        serializer = SpecialProjectSerializer(special_projects, many=True)
+        return Response(serializer.data)
+
+    def retrieve(self, request, pk=None):  # Modify retrieve method to accept pk
+        try:
+            special_project = SpecialProject.objects.get(pk=pk)
+        except SpecialProject.DoesNotExist:
+            return Response(status=status.HTTP_404_NOT_FOUND)
+
+        serializer = ArticleSerializer(special_project)
+        return Response(serializer.data)
 
 

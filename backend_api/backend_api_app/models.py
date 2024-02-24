@@ -83,7 +83,7 @@ class UserManager(BaseUserManager):
         if password is None:
             raise TypeError('Superusers must have a password.')
 
-        user = self.create_user(username, email, password)
+        user = self.create_user(username, password)
         user.is_superuser = True
         user.is_staff = True
         user.save()
@@ -106,15 +106,15 @@ class User(AbstractBaseUser, PermissionsMixin):
     last_name = models.CharField(max_length=25, null=True)
     middle_name = models.CharField(max_length=25, null=True)
     birth_date = models.DateField(null=True)
-    gender = models.CharField(choices=GENDER_CHOICES, max_length=10, null=True)
+    gender = models.CharField(choices=GENDER_CHOICES, max_length=10, null=True, default='Unknown')
     about = models.TextField(null=True, blank=True, max_length=500)
 
     is_email_verified = models.BooleanField(default=False)
     is_phone_verified = models.BooleanField(default=False)
-    kell_factor = models.CharField(choices=KELL_FACTOR_CHOICES, max_length=20)
-    blood_group = models.CharField(choices=BLOOD_GROUP_CHOICES, max_length=20)
-    rh_factor = models.CharField(choices=RH_FACTOR_CHOICES, max_length=20)
-    donor_status_name = models.CharField(max_length=20, null=True, choices=DONOR_STATUS_CHOICES)
+    kell_factor = models.CharField(choices=KELL_FACTOR_CHOICES, max_length=20, default='Unknown')
+    blood_group = models.CharField(choices=BLOOD_GROUP_CHOICES, max_length=20, default='Unknown')
+    rh_factor = models.CharField(choices=RH_FACTOR_CHOICES, max_length=20, default='Unknown')
+    donor_status_name = models.CharField(max_length=20, null=True, choices=DONOR_STATUS_CHOICES, default='Unknown')
     has_donor_certificate = models.BooleanField(default=False)
 
     ready_to_donate_blood = models.BooleanField(default=False)
@@ -172,15 +172,16 @@ class User(AbstractBaseUser, PermissionsMixin):
 
 class UserBonus(models.Model):
     user = models.ForeignKey(User, on_delete=models.CASCADE)
-    bonus_id = models.IntegerField()
-    date_received = models.DateTimeField(auto_now_add=True)
+    bonus_id = models.IntegerField(null=False)
+    date_received = models.DateTimeField(auto_now_add=True, null=False)
     date_expired = models.DateTimeField()
 
 
 class BonusFeedback(models.Model):
-    user_bonus = models.ForeignKey(UserBonus, on_delete=models.CASCADE)
+    user = models.ForeignKey(User, on_delete=models.CASCADE)
+    bonus_id = models.IntegerField()
     feedback = models.TextField(max_length=500)
-    date = models.DateTimeField(auto_now_add=True)
+    date = models.DateTimeField(auto_now_add=True, null=False)
     mark = models.IntegerField()
 
 
@@ -191,7 +192,8 @@ class Donation(models.Model):
     is_confirmed = models.BooleanField(default=False)
     donation_date = models.DateTimeField()
     blood_station_id = models.IntegerField()
-    donation_type = models.CharField(max_length=20, choices=DONATION_TYPES_CHOICES, null=False, blank=False)
+    donation_type = models.CharField(max_length=20, choices=DONATION_TYPES_CHOICES, null=False, blank=False,
+                                     default='blood')
     is_free = models.BooleanField(default=True)
 
 
@@ -199,7 +201,7 @@ class PlanDonation(models.Model):
     user = models.ForeignKey(User, on_delete=models.CASCADE)
     donation_date = models.DateTimeField()
     blood_station_id = models.IntegerField()
-    donation_type = models.CharField(max_length=20, choices=DONATION_TYPES_CHOICES)
+    donation_type = models.CharField(max_length=20, default='blood',choices=DONATION_TYPES_CHOICES)
     is_free = models.BooleanField(default=True)
 
 
@@ -227,6 +229,4 @@ class UserEvent(models.Model):
     user = models.ForeignKey(User, on_delete=models.CASCADE)
     event_id = models.IntegerField()
     date = models.DateTimeField(auto_now_add=True)
-
-
 
