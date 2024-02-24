@@ -8,6 +8,7 @@ import Register from "./pages/Register.jsx";
 import Login from "./pages/Login.jsx";
 import DonorsTop100 from "./pages/DonorsTop100.jsx";
 import Menu from "./pages/Menu.jsx";
+import EditProfile from "./pages/EditProfile.jsx";
 export const router = createBrowserRouter([
   {
     path: "/",
@@ -37,6 +38,10 @@ export const router = createBrowserRouter([
       {
         path: "/menu",
         element: <Menu />,
+      },
+      {
+        path: "/edit",
+        element: <EditProfile />,
       },
       {
         path: "*",

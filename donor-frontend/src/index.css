@@ -143,10 +143,11 @@ label {
   display: flex;
   justify-content: space-evenly;
   bottom: 0;
-  position: absolute;
+  position: sticky;
   width: 100%;
   padding: 1rem;
   background-color: var(--tg-theme-secondary-bg-color);
+  background-color: white;
   color: var(--tg-theme-button-text-color);
   box-shadow: rgba(0, 0, 0, 0.35) 0px 5px 15px;
   align-items: center;
