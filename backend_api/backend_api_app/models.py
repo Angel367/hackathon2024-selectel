@@ -178,7 +178,8 @@ class UserBonus(models.Model):
 
 
 class BonusFeedback(models.Model):
-    user_bonus = models.ForeignKey(UserBonus, on_delete=models.CASCADE)
+    user = models.ForeignKey(User, on_delete=models.CASCADE)
+    bonus_id = models.IntegerField()
     feedback = models.TextField(max_length=500)
     date = models.DateTimeField(auto_now_add=True, null=False)
     mark = models.IntegerField()

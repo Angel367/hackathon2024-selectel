@@ -2,7 +2,7 @@ import re
 
 from django.contrib.auth import authenticate
 from rest_framework import serializers
-from .models import Donation, PlanDonation, UserBonus, Article, SpecialProject
+from .models import Donation, PlanDonation, UserBonus, Article, SpecialProject, BonusFeedback
 from .models import User
 
 
@@ -216,7 +216,7 @@ class DonationForTopSerializer(serializers.ModelSerializer):
 
 class BonusFeedbackSerializer(serializers.ModelSerializer):
     class Meta:
-        model = UserBonus
+        model = BonusFeedback
         fields = '__all__'  # This will include all fields from the UserBonus model
 
 

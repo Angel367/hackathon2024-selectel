@@ -18,7 +18,7 @@ urlpatterns = [
     path('user/donor-card/', DonorCardAPIView.as_view()),
     path('user/main/', MainUserAPIView.as_view()),
     path('user/my-bonus/', MyBonusAPIView.as_view()),
-    path('bonus/<int:bonus_id>/', BonusFeedbackAPIView.as_view()),
     path('donation_top/', DonationTopApiView.as_view(), name='DonationTopApiView'),
+    path('bonus/<int:bonus_id>/', BonusFeedbackAPIView.as_view({'get': 'list'})),
     path('', include(router.urls))
 ]
