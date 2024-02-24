@@ -35,3 +35,27 @@ export const editUser = async (user) => {
     }
   );
 };
+export const editUserDonorCard = async (user) => {
+  const userToken = localStorage.getItem("user").token;
+  console.log(userToken);
+  return await axios.put(
+    "https://donorsearchorg.ru/api/user/donor-card/",
+      {
+
+        kell_factor: user.kell_factor,
+        blood_group: user.blood_group,
+        rh_factor: user.rh_factor,
+
+        ready_to_donate_blood: user.ready_to_donate_blood,
+        ready_to_donate_plasma: user.ready_to_donate_plasma,
+        ready_to_donate_platelets: user.ready_to_donate_platelets,
+        ready_to_donate_erythrocytes: user.ready_to_donate_erythrocytes,
+        ready_to_donate_granulocytes: user.ready_to_donate_granulocytes,
+      },
+    {
+      headers: {
+        "Content-Type": "application/json",
+      },
+    }
+  );
+};

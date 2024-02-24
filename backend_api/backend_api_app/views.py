@@ -124,7 +124,7 @@ class BonusFeedbackAPIView(viewsets.ViewSet):
         serializer = BonusFeedbackSerializer(feedback)
         return Response(serializer.data)
 
-    def update(self, request, bonus_id, pk=None):  # Add update method to handle PUT requests
+    def update(self, request, bonus_id):  # Add update method to handle PUT requests
         pk = request.data.get('id')
         user = request.user
         data = request.data.copy()

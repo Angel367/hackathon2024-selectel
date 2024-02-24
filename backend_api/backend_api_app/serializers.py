@@ -116,8 +116,13 @@ class DonorCardSerializer(serializers.ModelSerializer):
     class Meta:
         model = User
         read_only_fields = ['token']
-        fields = ['token', 'ready_to_donate_blood', 'ready_to_donate_granulocytes', 'ready_to_donate_platelets',
-                  'ready_to_donate_plasma', 'ready_to_donate_erythrocytes', 'kell_factor', 'blood_group', 'id']
+        fields = ['token', 'ready_to_donate_blood',
+                  'ready_to_donate_granulocytes',
+                  'ready_to_donate_platelets',
+                  'ready_to_donate_plasma',
+                  'ready_to_donate_erythrocytes',
+                  'kell_factor', 'rh_factor',
+                  'blood_group', 'id']
 
     def update(self, instance, validated_data):
         for key, value in validated_data.items():
