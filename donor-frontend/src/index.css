@@ -230,13 +230,14 @@ p {
   justify-content: space-between;
   padding: 0.3rem;
   background-color: var(--tg-theme-secondary-bg-color);
+  color: var(--tg-theme-button-text-color);
   border-radius: 0.4rem;
   border: #ff2a23 solid 1px;
   box-shadow: rgba(0, 0, 0, 0.1) 0px 4px 12px;
 }
 
 .ready {
-  border: #ff2a23 solid 3px;
+  border: #ff2a23 solid 2px;
   font-weight: 700;
   color: #ff2a23;
 }
@@ -245,4 +246,8 @@ p {
   display: flex;
   flex-wrap: wrap;
   gap: 1rem;
+}
+
+.readyToDonateItem__name {
+  color: var(--tg-theme-button-text-color);
 }
