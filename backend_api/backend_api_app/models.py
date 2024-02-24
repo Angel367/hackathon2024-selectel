@@ -1,3 +1,6 @@
+"""
+Модели Django ORM для приложения backend_api_app
+"""
 import re
 import time
 import jwt
@@ -92,6 +95,9 @@ class UserManager(BaseUserManager):
 
 
 class User(AbstractBaseUser, PermissionsMixin):
+    """
+    Кастомная модель пользователя
+    """
     username = models.CharField(db_index=True, max_length=255, unique=True)
     email = models.EmailField(db_index=True, null=True, unique=True)
     phone_number = models.CharField(db_index=True, max_length=11, null=True, unique=True)
@@ -171,6 +177,9 @@ class User(AbstractBaseUser, PermissionsMixin):
 
 
 class UserBonus(models.Model):
+    """
+    Модель для хранения бонусов пользователя
+    """
     user = models.ForeignKey(User, on_delete=models.CASCADE)
     bonus_id = models.IntegerField(null=False)
     date_received = models.DateTimeField(auto_now_add=True, null=False)
@@ -178,6 +187,9 @@ class UserBonus(models.Model):
 
 
 class BonusFeedback(models.Model):
+    """
+    Модель для хранения отзывов о бонусах
+    """
     user = models.ForeignKey(User, on_delete=models.CASCADE)
     bonus_id = models.IntegerField()
     feedback = models.TextField(max_length=500)
@@ -188,6 +200,9 @@ class BonusFeedback(models.Model):
 # Events get from api their
 
 class Donation(models.Model):
+    """
+    Модель для хранения информации о донорах
+    """
     user = models.ForeignKey(User, on_delete=models.CASCADE)
     is_confirmed = models.BooleanField(default=False)
     donation_date = models.DateTimeField()
@@ -198,6 +213,9 @@ class Donation(models.Model):
 
 
 class PlanDonation(models.Model):
+    """
+    Модель для хранения плановых доноров
+    """
     user = models.ForeignKey(User, on_delete=models.CASCADE)
     donation_date = models.DateTimeField()
     blood_station_id = models.IntegerField()
@@ -206,6 +224,9 @@ class PlanDonation(models.Model):
 
 
 class Article(models.Model):
+    """
+    Модель для хранения статей
+    """
     title = models.CharField(max_length=255)
     text = models.TextField(max_length=1000)
     date = models.DateTimeField(auto_now_add=True)
@@ -216,6 +237,9 @@ class Article(models.Model):
 
 
 class SpecialProject(models.Model):
+    """
+    Модель для хранения специальных проектов
+    """
     title = models.CharField(max_length=255)
     text = models.TextField(max_length=1000)
     date_start = models.DateTimeField(auto_now_add=True)
@@ -226,6 +250,9 @@ class SpecialProject(models.Model):
 
 
 class UserEvent(models.Model):
+    """
+    Модель для хранения событий пользователя
+    """
     user = models.ForeignKey(User, on_delete=models.CASCADE)
     event_id = models.IntegerField()
     date = models.DateTimeField(auto_now_add=True)
