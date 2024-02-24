@@ -21,23 +21,25 @@ function Login() {
         for (const arrayErrors of Object.values(errors)) {
           arrayErrors.forEach((error) => {
             toast.error(error, {
-              position: "bottom-right",
+              position: "top-right",
               autoClose: 5000,
               hideProgressBar: false,
               closeOnClick: true,
               pauseOnHover: true,
               draggable: true,
+              theme: "dark",
             });
           });
         }
       } else {
         toast.error(err.message, {
-          position: "bottom-right",
+          position: "top-right",
           autoClose: 5000,
           hideProgressBar: false,
           closeOnClick: true,
           pauseOnHover: true,
           draggable: true,
+          theme: "dark",
         });
       }
     }
