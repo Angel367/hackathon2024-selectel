@@ -1,12 +1,13 @@
 import { useEffect, useState } from "react";
 import ReadyToDonateItem from "../components/ReadyToDonateItem";
 import { readUser } from "../api/user_for_profile";
+import { editUserDonorCard } from "../api/user";
 
-function DonorCard(user) {
+function DonorCard() {
   const [donorInfo, setDonorInfo] = useState({});
   useEffect(() => {
     const getDonorInfo = async () => {
-      setDonorInfo((await readUser()).user);
+      setDonorInfo((await editUserDonorCard({})).user);
     };
 
     getDonorInfo();

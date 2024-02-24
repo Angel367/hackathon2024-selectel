@@ -49,6 +49,7 @@ input {
   border: 1px solid var(--tg-theme-secondary-bg-color);
   border-radius: 0.4rem;
   box-shadow: rgba(0, 0, 0, 0.35) 0px 5px 15px;
+  display: block;
 }
 .input_container {
   background-color: var(--tg-theme-secondary-bg-color);
@@ -98,8 +99,36 @@ h4 {
 
 label {
   color: var(--tg-theme-secondary-text-color);
+  display: flex;
+  flex-direction: column;
+  gap: 0.3rem;
 }
-
+fieldset {
+  color: var(--tg-theme-secondary-text-color);
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+  padding: 0.5rem;
+  box-shadow: rgba(0, 0, 0, 0.35) 0px 5px 15px;
+  border: none;
+  width: 100%;
+}
+input[type="radio"] {
+  display: inline;
+}
+.input_container > label {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  flex-direction: row;
+  padding: 0.5rem 0;
+}
+.input_container > label > input {
+  width: auto;
+  border: none;
+  margin: 0;
+  padding: 0;
+}
 .container {
   display: flex;
   flex-direction: column;
