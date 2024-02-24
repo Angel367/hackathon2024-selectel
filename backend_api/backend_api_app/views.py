@@ -299,6 +299,7 @@ class UserDonationViewSet(viewsets.ViewSet):
     # for donations (list, create, retrieve, update, delete)
     permission_classes = (IsAuthenticated,)  # Требуется авторизация через токен
 
+
     def list(self, request):
         """
         Получить все донорские записи пользователя.
@@ -315,6 +316,8 @@ class UserDonationViewSet(viewsets.ViewSet):
         :param request:
         :return:
         """
+        if "list" in request.data:
+            return self.list(request)
         user = request.user
         data = request.data.copy()
         data['user'] = user.id
@@ -402,6 +405,8 @@ class UserPlanDonationViewSet(viewsets.ViewSet):
         :param request:
         :return:
         """
+        if "list" in request.data:
+            return self.list(request)
         PlanDonation.objects.filter(user=request.user).delete()
         user = request.user
         data = request.data.copy()
@@ -632,15 +637,78 @@ class BloodStationSearchViewSet(viewsets.ViewSet):
         :return:
         """
         search_text = request.query_params.get('search_text', None)
-        bss = BloodStation.objects.all()
+        is_work_on_saturday = request.query_params.get('is_work_on_saturday', None)
+        is_work_on_sunday = request.query_params.get('is_work_on_sunday', None)
+        is_typing_available = request.query_params.get('is_typing_available', None)
+        is_without_registration = request.query_params.get('is_without_registration', None)
+        blood_type = request.query_params.get('blood_type', None)
 
+        id = request.query_params.get('id', None)
+        if id:
+            blood_station = BloodStation.objects.get(id=id)
+            blood_station_serializer = BloodStationSerializer(blood_station)
+            return Response(blood_station_serializer.data)
+        if blood_type:
+            bss = BloodStation.objects.filter(Q(**{blood_type: "need"}) | Q(**{blood_type: "unknown"}))
+        else:
+            bss = BloodStation.objects.all()
+        if search_text is None:
+            search_text = ""
         bs_titles = []
         for bs in bss:
             bs_titles.append(bs.title)
         nearest_to_search_text_bss = []
         for title in bs_titles:
             if search_text.lower() in title.lower():
-                nearest_to_search_text_bss.append(BloodStation.objects.filter(title=title)[0])
-        blood_station_serializer = BloodStationSerializer(nearest_to_search_text_bss, many=True)
+                for finded in BloodStation.objects.filter(title=title):
+                    nearest_to_search_text_bss.append(finded)
+
+        good_ones = []
+
+
+        if is_work_on_saturday and is_work_on_saturday == "true":
+            for bs in nearest_to_search_text_bss:
+                common_schedules = Schedule.objects.filter(bloodStation=bs)
+                is_work_on_saturday_common_schedule = False
+                for cs in common_schedules:
+                    if cs.dow == "Суббота":
+                        is_work_on_saturday_common_schedule = True
+                if is_work_on_saturday_common_schedule:
+                    good_ones.append(bs)
+        else:
+            good_ones = nearest_to_search_text_bss
+
+        good_oness = []
+
+        if is_work_on_sunday and is_work_on_sunday == "true":
+            for bs in nearest_to_search_text_bss:
+                common_schedules = Schedule.objects.filter(bloodStation=bs)
+                is_work_on_sunday_common_schedule = False
+                for cs in common_schedules:
+                    if cs.dow == "Воскресенье":
+                        is_work_on_sunday_common_schedule = True
+                if is_work_on_sunday_common_schedule:
+                    good_oness.append(bs)
+        else:
+            good_oness = good_ones
+        good_onesss = []
+
+        if is_typing_available and is_typing_available == "true":
+            for bs in nearest_to_search_text_bss:
+                if bs.with_typing:
+                    good_onesss.append(bs)
+        else:
+            good_onesss = good_oness
+
+        good_onessss = []
+
+        if is_without_registration and is_without_registration == "true":
+            for bs in nearest_to_search_text_bss:
+                if bs.without_registration:
+                    good_onessss.append(bs)
+        else:
+            good_onessss = good_onesss
+
+        blood_station_serializer = BloodStationSerializer(good_onessss, many=True)
         return Response(blood_station_serializer.data)
 

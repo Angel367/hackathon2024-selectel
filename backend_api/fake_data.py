@@ -45,6 +45,7 @@ for _ in range(50):
         ready_to_donate_erythrocytes=fake.boolean(),
         ready_to_donate_granulocytes=fake.boolean()
     )
+    user.set_password('12345678')
 
     # Create user bonuses
     for _ in range(250):

@@ -393,11 +393,41 @@ class MyDonationSerializer(serializers.ModelSerializer):
 
 class UserPlanDonationSerializer(serializers.ModelSerializer):
     """
-    Сериализация планов пожертвований пользователя.
+    Сериализация пожертвований пользователя.
     """
+    def update(self, instance, validated_data):
+        """
+        Обновление данных пожертвования.
+        :param instance:
+        :param validated_data:
+        :return:
+        """
+        validated_data.pop('is_confirmed', None)
+        for key, value in validated_data.items():
+            if value == '' or value is None:
+                continue
+            setattr(instance, key, value)
+        instance.save()
+        return instance
+
+    def to_representation(self, instance):
+        request = self.context.get('request')
+        representation = super().to_representation(instance)
+        if request and request.method == 'POST':
+            blood_station_id = representation.get('blood_station')
+            blood_station = BloodStation.objects.get(id=blood_station_id)
+            representation['blood_station'] = BloodStationSerializer(blood_station).data
+        else:
+            representation['blood_station'] = BloodStationSerializer(instance.blood_station).data
+        return representation
+
+    class Meta:
+        model = PlanDonation
+        fields = '__all__'
+
     class Meta:
         """
-        Мета-класс для сериализатора UserPlanDonationSerializer.
+        Мета-класс для сериализатора MyDonationSerializer.
         """
-        model = PlanDonation
-        fields = '__all__'  # This will include all fields from the PlanDonation model
+        model = Donation
+        fields = '__all__'  # This will include all fields from the Donation model
