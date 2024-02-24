@@ -1,3 +1,6 @@
+"""
+Модуль содержит кастомные бэкенды для аутентификации пользователей.
+"""
 from datetime import datetime
 
 from django.db.models import Q
@@ -9,7 +12,6 @@ from rest_framework.permissions import AllowAny, IsAuthenticated
 from rest_framework.response import Response
 from rest_framework.views import APIView
 
-from .models import Donation, PlanDonation, BonusFeedback
 from .renderers import UserJSONRenderer
 from .serializers import *
 
@@ -23,6 +25,11 @@ class RegistrationAPIView(APIView):
     serializer_class = RegistrationSerializer
 
     def post(self, request):
+        """
+        Создать нового пользователя. После этого вернуть его данные.
+        :param request:
+        :return:
+        """
         user = request.data.get('user', {})
 
         # Паттерн создания сериализатора, валидации и сохранения - довольно
@@ -34,12 +41,20 @@ class RegistrationAPIView(APIView):
 
 
 class LoginAPIView(APIView):
+    """
+    Разрешить всем пользователям (аутентифицированным и нет) доступ к данному эндпоинту.
+    """
     # for login
     permission_classes = (AllowAny,)
     renderer_classes = (UserJSONRenderer,)
     serializer_class = LoginSerializer
 
     def post(self, request):
+        """
+        Вход пользователя. Создать и вернуть токен.
+        :param request:
+        :return:
+        """
         user = request.data.get('user', {})
         serializer = self.serializer_class(data=user)
         serializer.is_valid(raise_exception=True)
@@ -47,12 +62,22 @@ class LoginAPIView(APIView):
 
 
 class UserRetrieveUpdateAPIView(RetrieveUpdateAPIView):
+    """
+    Разрешить только аутентифицированным пользователям доступ к данному эндпоинту.
+    """
     # for account settings user (retrieve and update)
     permission_classes = (IsAuthenticated,)
     renderer_classes = (UserJSONRenderer,)
     serializer_class = UserSerializer
 
     def retrieve(self, request, *args, **kwargs):
+        """
+        Получить данные пользователя.
+        :param request:
+        :param args:
+        :param kwargs:
+        :return:
+        """
         # Здесь нечего валидировать или сохранять. Мы просто хотим, чтобы
         # сериализатор обрабатывал преобразования объекта User во что-то, что
         # можно привести к json и вернуть клиенту.
@@ -60,6 +85,13 @@ class UserRetrieveUpdateAPIView(RetrieveUpdateAPIView):
         return Response(serializer.data, status=status.HTTP_200_OK)
 
     def update(self, request, *args, **kwargs):
+        """
+        Обновить данные пользователя.
+        :param request:
+        :param args:
+        :param kwargs:
+        :return:
+        """
         serializer_data = request.data
         # Паттерн сериализации, валидирования и сохранения - то, о чем говорили
         serializer = self.serializer_class(
@@ -72,16 +104,33 @@ class UserRetrieveUpdateAPIView(RetrieveUpdateAPIView):
 
 
 class DonorCardAPIView(RetrieveUpdateAPIView):
+    """
+    Разрешить только аутентифицированным пользователям доступ к данному эндпоинту.
+    """
     # for donor card (retrieve and update)
     permission_classes = (IsAuthenticated,)
     renderer_classes = (UserJSONRenderer,)
     serializer_class = DonorCardSerializer
 
     def retrieve(self, request, *args, **kwargs):
+        """
+        Получить данные донорской карты.
+        :param request:
+        :param args:
+        :param kwargs:
+        :return:
+        """
         serializer = self.serializer_class(request.user)
         return Response(serializer.data, status=status.HTTP_200_OK)
 
     def update(self, request, *args, **kwargs):
+        """
+        Обновить данные донорской карты.
+        :param request:
+        :param args:
+        :param kwargs:
+        :return:
+        """
         serializer_data = request.data
 
         serializer = self.serializer_class(
@@ -93,17 +142,32 @@ class DonorCardAPIView(RetrieveUpdateAPIView):
 
 
 class BonusFeedbackAPIView(viewsets.ViewSet):
+    """
+    Разрешить только аутентифицированным пользователям доступ к данному эндпоинту.
+    """
     # for bonus feedback (retrieve)
     permission_classes = (IsAuthenticated,)
     renderer_classes = (UserJSONRenderer,)
 
     def list(self, request, bonus_id):
+        """
+        Получить отзывы о бонусах.
+        :param request:
+        :param bonus_id:
+        :return:
+        """
         data = {
             "feedback": BonusFeedbackSerializer(BonusFeedback.objects.filter(bonus_id=bonus_id), many=True).data
         }
         return Response(data, status=status.HTTP_200_OK)
 
     def create(self, request, bonus_id):
+        """
+        Создать отзыв о бонусе.
+        :param request:
+        :param bonus_id:
+        :return:
+        """
         user = request.user
         data = request.data.copy()
         data['user'] = user.id
@@ -116,6 +180,12 @@ class BonusFeedbackAPIView(viewsets.ViewSet):
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
     def retrieve(self, request, pk=None):  # Modify retrieve method to accept pk
+        """
+        Получить отзыв о бонусе.
+        :param request:
+        :param pk:
+        :return:
+        """
         try:
             feedback = BonusFeedback.objects.get(pk=pk)
         except BonusFeedback.DoesNotExist:
@@ -125,6 +195,12 @@ class BonusFeedbackAPIView(viewsets.ViewSet):
         return Response(serializer.data)
 
     def update(self, request, bonus_id):  # Add update method to handle PUT requests
+        """
+        Обновить отзыв о бонусе.
+        :param request:
+        :param bonus_id:
+        :return:
+        """
         pk = request.data.get('id')
         user = request.user
         data = request.data.copy()
@@ -142,6 +218,13 @@ class BonusFeedbackAPIView(viewsets.ViewSet):
 
     @action(detail=True, methods=['delete'])
     def delete(self, request, bonus_id, pk=None):  # Modify delete method to accept pk
+        """
+
+        :param request:
+        :param bonus_id:
+        :param pk:
+        :return:
+        """
         pk = request.data.get('id')
         try:
             feedback = BonusFeedback.objects.get(pk=pk)
@@ -153,11 +236,19 @@ class BonusFeedbackAPIView(viewsets.ViewSet):
 
 
 class MyBonusAPIView(APIView):
+    """
+    Разрешить только аутентифицированным пользователям доступ к данному эндпоинту.
+    """
     # for bonus my (retrieve)
     permission_classes = (IsAuthenticated,)
     renderer_classes = (UserJSONRenderer,)
 
     def get(self, request):
+        """
+        Получить бонусы пользователя.
+        :param request:
+        :return:
+        """
         user = request.user
         data = {
             "bonus": UserBonusSerializer(UserBonus.objects.filter(user=user), many=True).data
@@ -166,16 +257,24 @@ class MyBonusAPIView(APIView):
 
 
 class MainUserAPIView(APIView):
+    """
+    Разрешить только аутентифицированным пользователям доступ к данному эндпоинту.
+    """
     # for all data (retrieve)
     permission_classes = (IsAuthenticated,)
     renderer_classes = (UserJSONRenderer,)
 
     def get(self, request):
+        """
+        Получить все данные пользователя.
+        :param request:
+        :return:
+        """
         user = request.user
         data = UserSerializer(user).data
         donor_card = DonorCardSerializer(user).data
         plan_donation_last = (PlanDonation.objects.filter(user=user, donation_date__gte=datetime.now())
-                              .order_by('date').first())
+                              .order_by('donation_date').last())
         donor_card.pop('token')
         data.update({
             "donor_card": donor_card,
@@ -193,15 +292,28 @@ class MainUserAPIView(APIView):
 
 
 class UserDonationViewSet(viewsets.ViewSet):
+    """
+    Разрешить только аутентифицированным пользователям доступ к данному эндпоинту.
+    """
     # for donations (list, create, retrieve, update, delete)
     permission_classes = (IsAuthenticated,)  # Требуется авторизация через токен
 
     def list(self, request):
+        """
+        Получить все донорские записи пользователя.
+        :param request:
+        :return:
+        """
         donations = Donation.objects.filter(user=request.user)
         serializer = MyDonationSerializer(donations, many=True)
         return Response(serializer.data)
 
     def create(self, request):
+        """
+        Создать новую донорскую запись.
+        :param request:
+        :return:
+        """
         user = request.user
         data = request.data.copy()
         data['user'] = user.id
@@ -213,6 +325,12 @@ class UserDonationViewSet(viewsets.ViewSet):
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
     def retrieve(self, request, pk=None):  # Modify retrieve method to accept pk
+        """
+        Получить донорскую запись пользователя.
+        :param request:
+        :param pk:
+        :return:
+        """
         try:
             donation = Donation.objects.get(pk=pk)
         except Donation.DoesNotExist:
@@ -222,6 +340,12 @@ class UserDonationViewSet(viewsets.ViewSet):
         return Response(serializer.data)
 
     def update(self, request, pk=None):  # Add update method to handle PUT requests
+        """
+        Обновить донорскую запись пользователя.
+        :param request:
+        :param pk:
+        :return:
+        """
         pk = request.data.get('id')
         user = request.user
         data = request.data.copy()
@@ -239,6 +363,12 @@ class UserDonationViewSet(viewsets.ViewSet):
 
     @action(detail=True, methods=['delete'])
     def delete(self, request, pk=None):  # Modify delete method to accept pk
+        """
+        Удалить донорскую запись пользователя.
+        :param request:
+        :param pk:
+        :return:
+        """
         pk = request.data.get('id')
         try:
             donation = Donation.objects.get(pk=pk)
@@ -250,14 +380,27 @@ class UserDonationViewSet(viewsets.ViewSet):
 
 
 class UserPlanDonationViewSet(viewsets.ViewSet):
+    """
+    Разрешить только аутентифицированным пользователям доступ к данному эндпоинту.
+    """
     permission_classes = (IsAuthenticated,)  # Требуется авторизация через токен
 
     def list(self, request):
+        """
+        Получить все плановые донорские записи пользователя.
+        :param request:
+        :return:
+        """
         donations = PlanDonation.objects.filter(user=request.user)
         serializer = UserPlanDonationSerializer(donations, many=True)
         return Response(serializer.data)
 
     def create(self, request):
+        """
+        Создать новую плановую донорскую запись.
+        :param request:
+        :return:
+        """
         user = request.user
         data = request.data.copy()
         data['user'] = user.id
@@ -269,6 +412,12 @@ class UserPlanDonationViewSet(viewsets.ViewSet):
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
     def retrieve(self, request, pk=None):  # Modify retrieve method to accept pk
+        """
+        Получить плановую донорскую запись пользователя.
+        :param request:
+        :param pk:
+        :return:
+        """
         try:
             donation = PlanDonation.objects.get(pk=pk)
         except PlanDonation.DoesNotExist:
@@ -278,6 +427,12 @@ class UserPlanDonationViewSet(viewsets.ViewSet):
         return Response(serializer.data)
 
     def update(self, request, pk=None):  # Add update method to handle PUT requests
+        """
+        Обновить плановую донорскую запись пользователя.
+        :param request:
+        :param pk:
+        :return:
+        """
         pk = request.data.get('id')
         user = request.user
         data = request.data.copy()
@@ -295,6 +450,9 @@ class UserPlanDonationViewSet(viewsets.ViewSet):
 
 
 class DonationTopApiView(APIView):
+    """
+    Разрешить всем пользователям (аутентифицированным и нет) доступ к данному эндпоинту.
+    """
     def get(self, request):
         if request.query_params.get('blood_center_id'):
             donations = Donation.objects.filter(
@@ -359,9 +517,17 @@ class DonationTopApiView(APIView):
 
 
 class ArticleViewSet(viewsets.ViewSet):
+    """
+    Разрешить всем пользователям (аутентифицированным и нет) доступ к данному эндпоинту.
+    """
     permission_classes = (AllowAny,)  # Требуется авторизация через токен
 
     def list(self, request):
+        """
+        Получить все статьи.
+        :param request:
+        :return:
+        """
         keywords = request.query_params.get('keywords', None)
         if keywords is not None:
             articles = (Article.objects.filter(is_active=True)
@@ -372,6 +538,12 @@ class ArticleViewSet(viewsets.ViewSet):
         return Response(serializer.data)
 
     def retrieve(self, request, pk=None):  # Modify retrieve method to accept pk
+        """
+        Получить статью.
+        :param request:
+        :param pk:
+        :return:
+        """
         try:
             article = Article.objects.get(pk=pk)
         except Article.DoesNotExist:
@@ -382,14 +554,28 @@ class ArticleViewSet(viewsets.ViewSet):
 
 
 class SpecialProjectViewSet(viewsets.ViewSet):
+    """
+    Разрешить всем пользователям (аутентифицированным и нет) доступ к данному эндпоинту.
+    """
     permission_classes = (AllowAny,)  # Требуется авторизация через токен
 
     def list(self, request):
+        """
+        Получить все специальные проекты.
+        :param request:
+        :return:
+        """
         special_projects = SpecialProject.objects.filter(is_active=True)
         serializer = SpecialProjectSerializer(special_projects, many=True)
         return Response(serializer.data)
 
     def retrieve(self, request, pk=None):  # Modify retrieve method to accept pk
+        """
+        Получить специальный проект.
+        :param request:
+        :param pk:
+        :return:
+        """
         try:
             special_project = SpecialProject.objects.get(pk=pk)
         except SpecialProject.DoesNotExist:

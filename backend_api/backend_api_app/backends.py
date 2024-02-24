@@ -1,3 +1,6 @@
+"""
+Модуль содержит кастомные бэкенды для аутентификации пользователей.
+"""
 import jwt
 
 from django.conf import settings
@@ -10,7 +13,18 @@ from .models import User
 
 
 class EmailPhoneAuthBackend(ModelBackend):
+    """
+    Аутентификация по email или номеру телефона.
+    """
     def authenticate(self, request, username=None, password=None, **kwargs):
+        """
+        Аутентификация пользователя по email или номеру телефона.
+        :param request:
+        :param username:
+        :param password:
+        :param kwargs:
+        :return:
+        """
         if User.objects.filter(email=username).exists():
             user = User.objects.filter(email=username)[0]
         elif User.objects.filter(phone_number=username).exists():
@@ -22,6 +36,11 @@ class EmailPhoneAuthBackend(ModelBackend):
         return None
 
     def get_user(self, user_id):
+        """
+        Получение пользователя по его id.
+        :param user_id:
+        :return:
+        """
         if User.objects.filter(pk=user_id).exists():
             return User.objects.get(pk=user_id)
         else:

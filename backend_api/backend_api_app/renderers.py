@@ -1,9 +1,15 @@
+"""
+Мы создали новый файл renderers.py внутри нашего приложения backend_api_app.
+"""
 import json
 
 from rest_framework.renderers import JSONRenderer
 
 
 class UserJSONRenderer(JSONRenderer):
+    """
+    Класс UserJSONRenderer наследуется от JSONRenderer и переопределяет метод
+    """
     charset = 'utf-8'
 
     def render(self, data, media_type=None, renderer_context=None):

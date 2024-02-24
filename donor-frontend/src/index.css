@@ -166,12 +166,11 @@ label {
 }
 
 .container {
-  background-color: #ffffff;
+  background-color: --tg-theme-bg-color;
   padding: 30px;
   box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
   text-align: center;
   overflow: hidden;
-  background-color: var(--tg-theme--bg-color);
 }
 .donor-list {
   justify-content: center;
@@ -179,7 +178,7 @@ label {
 }
 
 .donor-card {
-  background-color: var(--tg-theme-secondary-bg-color);
+  background-color: --tg-theme-bg-color;
   border-radius: 10px;
   box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
   padding: 15px 20px;
@@ -191,6 +190,7 @@ label {
 }
 
 h3 {
+  color: var(--tg-theme-text-color);
   font-size: 18px;
   font-weight: bold;
   margin: 0;
@@ -198,7 +198,7 @@ h3 {
 }
 
 p {
-  color: #6c6c6c;
+  color: var(--tg-theme-text-color);
   font-size: 14px;
   padding: 0;
   margin: 0;
