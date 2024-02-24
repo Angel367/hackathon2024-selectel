@@ -7,8 +7,9 @@ export default function Home() {
   const navigate = useNavigate();
   useEffect(() => {
     tg.ready();
-    tg.BackButton.show();
-    tg.BackButton.onClick(navigate(-1));
+    if (tg.isClosing) {
+      navigate("/");
+    }
   }, []);
   return (
     <div>
