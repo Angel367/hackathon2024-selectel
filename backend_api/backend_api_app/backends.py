@@ -2,6 +2,7 @@ import jwt
 
 from django.conf import settings
 from django.contrib.auth.backends import ModelBackend
+from jwt.exceptions import ExpiredSignatureError
 
 from rest_framework import authentication, exceptions
 
@@ -90,9 +91,11 @@ class JWTAuthentication(authentication.BaseAuthentication):
         """
         try:
             payload = jwt.decode(token, settings.SECRET_KEY, algorithms=['HS256'])
-        except Exception:
-            msg = 'Ошибка аутентификации. Невозможно декодировать токеню'
-            raise exceptions.AuthenticationFailed(msg)
+        except ExpiredSignatureError as e:
+            msg = 'Ошибка аутентификации. Невозможно декодировать токен.'
+            raise exceptions.AuthenticationFailed(e)
+        except Exception as e:
+            raise exceptions.AuthenticationFailed(e)
 
         try:
             user = User.objects.get(pk=payload['id'])

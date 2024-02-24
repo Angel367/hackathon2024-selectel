@@ -150,9 +150,11 @@ class UserSerializer(serializers.ModelSerializer):
         model = User
         fields = ['email', 'username', 'password',
                   'token', 'id', 'phone_number', 'first_name',
-                  'last_name', 'middle_name', 'birth_date',
-                  'is_email_verified', 'is_phone_verified',
-                  'about', 'old_password', 'new_password']
+                  'last_name', 'middle_name', 'birth_date', 'gender', 'about',
+                  'is_email_verified', 'is_phone_verified', 'kell_factor', 'blood_group', 'rh_factor',
+                    'donor_status_name', 'has_donor_certificate', 'ready_to_donate_blood', 'ready_to_donate_plasma',
+                    'ready_to_donate_platelets', 'ready_to_donate_erythrocytes', 'ready_to_donate_granulocytes',
+                  'old_password', 'new_password']
         read_only_fields = ['token']
 
     def update(self, instance, validated_data):

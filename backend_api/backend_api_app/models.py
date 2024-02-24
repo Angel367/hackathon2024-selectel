@@ -99,7 +99,7 @@ class User(AbstractBaseUser, PermissionsMixin):
     is_staff = models.BooleanField(default=False)
     created_at = models.DateTimeField(auto_now_add=True)
     city_id = models.IntegerField(null=True)
-    # image = models.ImageField(upload_to='users/', null=True)
+    image_url = models.CharField(max_length=255, null=True)
     updated_at = models.DateTimeField(auto_now=True)
 
     first_name = models.CharField(max_length=25, null=True)
