@@ -3,7 +3,7 @@ import {readDonation, readDonationList} from "../../api/donations.js";
 import {useParams} from "react-router-dom";
 
 
-const Donation = () => {
+const PlanDonation = () => {
   const {id} = useParams();
   const [donation, setDonation] = useState([]);
   // const [is_confirmed, setConfirmed] = useState(false);
@@ -21,21 +21,20 @@ const Donation = () => {
   useEffect(() => {
     fetchData();
   },  []);
-  console.log(donation.is_confirmed, "is_confirmed");
+
   return (
     <div className="container">
 
             <div className="donation-card">
               <p>{donation.donation_date}</p>
-              {/*<h4>{donation.blood_station.title}</h4>*/}
-              {/*  <p>{donation.blood_station.address} </p>*/} //TODO: fix this
+              <h4>{donation.blood_station.title}</h4>
+                <p>{donation.blood_station.address} </p>
               <p>{donation.donation_type} </p>
                 <p>{donation.is_free} </p>
                 <p>{donation.is_confirmed} </p>
-              {/*<p></p>*/}
             </div>
 
             </div>
     );
 }
-export default Donation;
+export default PlanDonation;

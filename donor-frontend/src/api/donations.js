@@ -23,7 +23,7 @@ export const readDonation = async (user, id_donation) => {
   const userToken = user.user.token;
   // console.log(userToken);
   return await axios.put(
-    `http://localhost:8000/api/user/donations/${id_donation}/`,
+    `http://donorsearchorg.ru/api/user/donations/${id_donation}/`,
     {
         token: "token " + userToken,
         id: id_donation,
@@ -37,37 +37,37 @@ export const readDonation = async (user, id_donation) => {
     }
   );
 }
-export const updateDonation = async (user, id_donation, donation) => {
-  const userToken = localStorage.getItem("user").token;
-  console.log(userToken);
-  return await axios.put(
-    `https://donorsearchorg.ru/api/user/donations/${id_donation}/`,
-    {
-        token: "token " + userToken,
-        donation_date: donation.donation_date,
-        blood_station_id:donation.blood_station_id,
-        donation_type: donation.donation_type,
-        is_free: donation.is_free,
-    },
-    {
-      headers: {
-        "Content-Type": "application/json",
-      },
-    }
-  );
-}
+// export const updateDonation = async (user, id_donation, donation) => {
+//   const userToken = localStorage.getItem("user").token;
+//   console.log(userToken);
+//   return await axios.put(
+//     `https://donorsearchorg.ru/api/user/donations/${id_donation}/`,
+//     {
+//         token: "token " + userToken,
+//         donation_date: donation.donation_date,
+//         blood_station_id:donation.blood_station_id,
+//         donation_type: donation.donation_type,
+//         is_free: donation.is_free,
+//     },
+//     {
+//       headers: {
+//         "Content-Type": "application/json",
+//       },
+//     }
+//   );
+// }
 
-export const createDonation = async (user, donation) => {
-  const userToken = localStorage.getItem("user").token;
-  console.log(userToken);
+export const createDonation = async (user, donation_date, is_free, donation_type, blood_station_id) => {
+  const userToken = user.user.token;
+
   return await axios.post(
     "https://donorsearchorg.ru/api/user/donations/",
     {
         token: "token " + userToken,
-        donation_date: donation.donation_date,
-        blood_station_id:donation.blood_station_id,
-        donation_type: donation.donation_type,
-        is_free: donation.is_free,
+        donation_date: donation_date,
+        blood_station:blood_station_id,
+        donation_type: donation_type,
+        is_free: is_free
     },
     {
       headers: {
@@ -78,7 +78,7 @@ export const createDonation = async (user, donation) => {
 }
 
 export const deleteDonation = async (user, id_donation) => {
-  const userToken = localStorage.getItem("user").token;
+  const userToken = user.user.token;
   console.log(userToken);
   return await axios.delete(
     `https://donorsearchorg.ru/api/user/donations/${id_donation}/`,
