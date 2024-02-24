@@ -42,13 +42,24 @@ form > button {
 input {
   background-color: var(--tg-theme-secondary-bg-color);
   color: var(--tg-theme-button-text-color);
-  width: 100%;
+  width: 300px;
+  margin: 0 auto;
   padding: 12px 20px;
   border: 1px solid var(--tg-theme-secondary-bg-color);
   border-radius: 0.4rem;
   box-shadow: rgba(0, 0, 0, 0.35) 0px 5px 15px;
 }
-
+.input_container {
+  overflow: scroll;
+  background-color: var(--tg-theme-secondary-bg-color);
+  color: var(--tg-theme-button-text-color);
+  width: 300px;
+  margin: 0 auto;
+  padding: 12px 20px;
+  border: 1px solid var(--tg-theme-secondary-bg-color);
+  border-radius: 0.4rem;
+  box-shadow: rgba(0, 0, 0, 0.35) 0px 5px 15px;
+}
 h1 {
   text-align: center;
   padding-top: 1rem;
@@ -107,4 +118,36 @@ label {
 
 .goTo h4 {
   text-decoration: underline;
+}
+
+.menuGrid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 2rem;
+}
+
+.menuCard {
+  background-color: var(--tg-theme-secondary-bg-color);
+  padding: 1rem;
+  border-radius: 0.5rem;
+  box-shadow: rgba(0, 0, 0, 0.35) 0px 5px 15px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  width: 160px;
+  gap: 1rem;
+}
+
+.footer {
+  display: flex;
+  justify-content: space-evenly;
+  bottom: 0;
+  position: absolute;
+  width: 100%;
+  padding: 1rem;
+  background-color: var(--tg-theme-secondary-bg-color);
+  color: var(--tg-theme-button-text-color);
+  box-shadow: rgba(0, 0, 0, 0.35) 0px 5px 15px;
+  align-items: center;
 }

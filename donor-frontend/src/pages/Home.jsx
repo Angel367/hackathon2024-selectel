@@ -1,14 +1,14 @@
 import React, { useEffect } from "react";
 import DonorButton from "../components/DonorButton.jsx";
 import { Link } from "react-router-dom";
+import { useNavigate } from "react-router-dom";
 const tg = window.Telegram.WebApp;
 export default function Home() {
+  const navigate = useNavigate();
   useEffect(() => {
     tg.ready();
     tg.BackButton.show();
-    return () => {
-      tg.BackButton.hide();
-    };
+    tg.BackButton.onClick(navigate(-1));
   }, []);
   return (
     <div>
