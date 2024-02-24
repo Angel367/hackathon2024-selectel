@@ -20,12 +20,8 @@ buttons = [
         "url": main_url + "bloodstations"
     },
     {
-        "text": "Пожертвовать проекту",
-        "url": main_url + "donate"
-    },
-    {
-        "text": "text",
-        "url": "https://donor-frontend.vercel.app/"
+        "text": "Топ доноров",
+        "url": main_url + "top/"
     }
 ]
 
