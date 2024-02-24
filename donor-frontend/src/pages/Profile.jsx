@@ -1,6 +1,7 @@
 import { useParams } from "react-router-dom";
 import DonorButton from "../components/DonorButton";
 import { useNavigate } from "react-router-dom";
+import { useEffect } from "react";
 export default function Profile() {
   const navigate = useNavigate();
   const { username } = useParams();
@@ -29,6 +30,7 @@ export default function Profile() {
   }
 
   const donorInfo = [];
+  useEffect(() => {});
 
   return (
     <div className="container">

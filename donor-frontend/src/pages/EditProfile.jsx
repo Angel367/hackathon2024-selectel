@@ -17,6 +17,10 @@ function EditProfile() {
       middle_name: null,
       about: null,
       birth_date: null,
+      rh_factor: "Unknown",
+      kell_factor: "Unknown",
+      blood_group: "Unknown",
+      gender: "Unknown",
     },
   });
   const navigate = useNavigate();
@@ -145,6 +149,7 @@ function EditProfile() {
                 {...register("gender")}
                 name="gender"
                 value="unknown"
+                checked
               />
               Неизвестно
             </label>
@@ -190,6 +195,7 @@ function EditProfile() {
                 {...register("kell_factor")}
                 name="kell_factor"
                 value="Unknown"
+                checked
               />
               Неизвестно
             </label>
@@ -244,7 +250,8 @@ function EditProfile() {
                 id="Unknown"
                 {...register("blood_group")}
                 name="blood_group"
-                value="unknown"
+                value="Unknown"
+                checked
               />
               Неизвестно
             </label>
@@ -280,6 +287,7 @@ function EditProfile() {
                 {...register("rh_factor")}
                 name="rh_factor"
                 value="Unknown"
+                checked
               />
               Неизвестно
             </label>
@@ -288,12 +296,6 @@ function EditProfile() {
 
         <DonorButton type="submit" text="Сохранить изменения" />
       </form>
-      <div className="goTo">
-        <h5>Есть аккаунт?</h5>
-        <Link to="/login">
-          <h4>Войти</h4>
-        </Link>
-      </div>
       <ToastContainer />
     </div>
   );

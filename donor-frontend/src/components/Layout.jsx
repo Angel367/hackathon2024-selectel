@@ -3,7 +3,7 @@ function Layout() {
   const user =
     localStorage.getItem("user") && JSON.parse(localStorage.getItem("user"));
   return (
-    <div>
+    <main>
       <div className="navbar">
         <Link to="/">
           <div className="drops">
@@ -11,6 +11,7 @@ function Layout() {
           </div>
         </Link>
       </div>
+
       <Outlet />
       <div className="footer">
         {user && (
@@ -22,7 +23,7 @@ function Layout() {
           <img src="/menu.svg" width={60} height={60} />
         </Link>
       </div>
-    </div>
+    </main>
   );
 }
 

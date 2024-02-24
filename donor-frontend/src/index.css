@@ -6,7 +6,7 @@
 }
 
 html {
-  min-height: 100vh;
+  height: 100vh;
 }
 
 body {
@@ -29,6 +29,10 @@ a {
   font-size: medium;
   font-weight: 700;
   padding: 1rem;
+}
+
+main {
+  height: 100vh;
 }
 
 form {
@@ -147,8 +151,9 @@ label {
 .footer {
   display: flex;
   justify-content: space-evenly;
+  left: 0;
   bottom: 0;
-  position: sticky;
+  position: fixed;
   width: 100%;
   padding: 1rem;
   background-color: var(--tg-theme-secondary-bg-color);
