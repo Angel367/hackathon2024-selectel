@@ -13,6 +13,8 @@ router.register(r'user/plan_donations', UserPlanDonationViewSet, basename='user_
 
 router.register(r'journal', ArticleViewSet, basename='journal'),
 router.register(r'special', SpecialProjectViewSet, basename='special'),
+router.register(r'city', CityViewSet, basename='city'),
+router.register(r'blood_station_search', BloodStationSearchViewSet, basename='city_search'),
 
 urlpatterns = [
     path('user/account/', UserRetrieveUpdateAPIView.as_view()),

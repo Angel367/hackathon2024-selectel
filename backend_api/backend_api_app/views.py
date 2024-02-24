@@ -587,3 +587,60 @@ class SpecialProjectViewSet(viewsets.ViewSet):
         return Response(serializer.data)
 
 
+class CityViewSet(viewsets.ViewSet):
+    """
+    Разрешить всем пользователям (аутентифицированным и нет) доступ к данному эндпоинту.
+    """
+    permission_classes = (AllowAny,)  # Требуется авторизация через токен
+
+    def list(self, request):
+        """
+        Получить все города.
+        :param request:
+        :return:
+        """
+        cities = City.objects.all()
+        serializer = CitySerializer(cities, many=True)
+        return Response(serializer.data)
+
+    def retrieve(self, request, pk=None):  # Modify retrieve method to accept pk
+        """
+        Получить город.
+        :param request:
+        :param pk:
+        :return:
+        """
+        try:
+            city = City.objects.get(pk=pk)
+        except City.DoesNotExist:
+            return Response(status=status.HTTP_404_NOT_FOUND)
+
+        serializer = CitySerializer(city)
+        return Response(serializer.data)
+
+
+class BloodStationSearchViewSet(viewsets.ViewSet):
+    """
+    Разрешить всем пользователям (аутентифицированным и нет) доступ к данному эндпоинту.
+    """
+    permission_classes = (AllowAny,)  # Требуется авторизация через токен
+
+    def list(self, request):
+        """
+        Найти ближайшие к введенному тексту центр крови.
+        :param request:
+        :return:
+        """
+        search_text = request.query_params.get('search_text', None)
+        bss = BloodStation.objects.all()
+
+        bs_titles = []
+        for bs in bss:
+            bs_titles.append(bs.title)
+        nearest_to_search_text_bss = []
+        for title in bs_titles:
+            if search_text.lower() in title.lower():
+                nearest_to_search_text_bss.append(BloodStation.objects.filter(title=title)[0])
+        blood_station_serializer = BloodStationSerializer(nearest_to_search_text_bss, many=True)
+        return Response(blood_station_serializer.data)
+

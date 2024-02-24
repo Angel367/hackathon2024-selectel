@@ -1,5 +1,5 @@
 import json
-from backend_api_app.models import Country, Region, City, Schedule, PhoneNumber, DonationCenter
+from backend_api_app.models import Country, Region, City, Schedule, PhoneNumber, BloodStation
 from django.core.management.base import BaseCommand
 
 
@@ -11,6 +11,8 @@ class Command(BaseCommand):
 
         for item in data:
             try:
+                if item['closed']:
+                    continue
                 country_data = item['city']['country']
                 country, _ = Country.objects.get_or_create(
                     id=country_data['id'],
@@ -36,27 +38,11 @@ class Command(BaseCommand):
                     lng=city_data['lng']
                 )
 
-                schedule_data = item['schedule']
-                for schedule_item in schedule_data:
-                    Schedule.objects.get_or_create(
-                        id=schedule_item['id'],
-                        dow=schedule_item['dow'],
-                        start=schedule_item['start'],
-                        end=schedule_item['end']
-                    )
-
-                phone_numbers_data = item['phone_numbers']
-                for phone_number_item in phone_numbers_data:
-                    PhoneNumber.objects.get_or_create(
-                        id=phone_number_item['id'],
-                        phone=phone_number_item['phone'],
-                        comment=phone_number_item['comment']
-                    )
                 if item['blood_status'] is None:
                     blood_status = "unknown"
                 else:
                     blood_status = item['blood_status']
-                DonationCenter.objects.get_or_create(
+                bs, created = BloodStation.objects.get_or_create(
                     id=item['id'],
                     city=city,
                     has_blood_group=item['has_blood_group'],
@@ -90,6 +76,23 @@ class Command(BaseCommand):
                     closed=item['closed'],
                     priority=item['priority']
                 )
+                schedule_data = item['schedule']
+                for schedule_item in schedule_data:
+                    Schedule.objects.get_or_create(
+                        id=schedule_item['id'],
+                        bloodStation=bs,
+                        dow=schedule_item['dow'],
+                        start=schedule_item['start'],
+                        end=schedule_item['end']
+                    )
+                phone_numbers_data = item['phone_numbers']
+                for phone_number_item in phone_numbers_data:
+                    PhoneNumber.objects.get_or_create(
+                        id=phone_number_item['id'],
+                        bloodStation=bs,
+                        phone=phone_number_item['phone'],
+                        comment=phone_number_item['comment']
+                    )
             except Exception as e:
                 print(e)
                 continue
