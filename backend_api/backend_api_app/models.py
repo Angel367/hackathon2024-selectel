@@ -51,6 +51,70 @@ DONOR_STATUS_CHOICES = (
 )
 
 
+class Country(models.Model):
+    title = models.CharField(max_length=100)
+
+
+class Region(models.Model):
+    title = models.CharField(max_length=100)
+
+
+class City(models.Model):
+    title = models.CharField(max_length=100)
+    slug = models.SlugField()
+    region = models.ForeignKey(Region, on_delete=models.CASCADE)
+    country = models.ForeignKey(Country, on_delete=models.CASCADE)
+    priority = models.IntegerField()
+    lat = models.FloatField(null=True)
+    lng = models.FloatField(null=True)
+
+
+class Schedule(models.Model):
+    dow = models.CharField(max_length=20)
+    start = models.TimeField()
+    end = models.TimeField()
+
+
+class PhoneNumber(models.Model):
+    phone = models.CharField(max_length=20)
+    comment = models.CharField(max_length=100, blank=True)
+
+
+class DonationCenter(models.Model):
+    city = models.ForeignKey(City, on_delete=models.CASCADE)
+    has_blood_group = models.BooleanField(default=False)
+    lat = models.FloatField()
+    lng = models.FloatField()
+    blood_status = models.CharField(max_length=20, default="unknown")
+    title = models.CharField(max_length=100)
+    parser_url = models.URLField(null=True, blank=True)
+    is_get_from_parser = models.BooleanField(default=False)
+    o_plus = models.CharField(max_length=20)
+    o_minus = models.CharField(max_length=20)
+    a_plus = models.CharField(max_length=20)
+    a_minus = models.CharField(max_length=20)
+    b_plus = models.CharField(max_length=20)
+    b_minus = models.CharField(max_length=20)
+    ab_plus = models.CharField(max_length=20)
+    ab_minus = models.CharField(max_length=20)
+    blood = models.CharField(max_length=20)
+    plasma = models.CharField(max_length=20)
+    platelets = models.CharField(max_length=20)
+    erythrocytes = models.CharField(max_length=20)
+    leukocytes = models.CharField(max_length=20)
+    address = models.CharField(max_length=255)
+    site = models.URLField()
+    phones = models.CharField(max_length=100)
+    email = models.EmailField(blank=True)
+    worktime = models.CharField(max_length=255)
+    without_registration = models.BooleanField(default=False)
+    with_typing = models.BooleanField(default=False)
+    for_moscow = models.BooleanField(default=False)
+    closed = models.BooleanField(default=False)
+    priority = models.IntegerField()
+
+
+
 class UserManager(BaseUserManager):
     """
     Django требует, чтобы кастомные пользователи определяли свой собственный

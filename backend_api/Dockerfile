@@ -20,6 +20,7 @@ COPY backend_api/manage.py /code/
 RUN python manage.py makemigrations
 RUN python manage.py makemigrations backend_api_app
 RUN python manage.py migrate
+RUN python manage.py import_data
 
 # Specify the command to run on container start
 CMD ["python", "manage.py", "runserver", "0.0.0.0:8000"]
