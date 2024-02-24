@@ -4,8 +4,7 @@ export const editUser = async (user) => {
   console.log(userToken);
   return await axios.put(
     "https://donorsearchorg.ru/api/user/account/",
-    {
-      user: {
+      {
         email: user.email,
         username: user.username,
         token: "token " + userToken,
@@ -29,7 +28,6 @@ export const editUser = async (user) => {
         ready_to_donate_erythrocytes: user.ready_to_donate_erythrocytes,
         ready_to_donate_granulocytes: user.ready_to_donate_granulocytes,
       },
-    },
     {
       headers: {
         "Content-Type": "application/json",

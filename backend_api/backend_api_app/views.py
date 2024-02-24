@@ -174,7 +174,8 @@ class MainUserAPIView(APIView):
         user = request.user
         data = UserSerializer(user).data
         donor_card = DonorCardSerializer(user).data
-        plan_donation_last = PlanDonation.objects.filter(user=user, date__gte=datetime.now()).order_by('date').first()
+        plan_donation_last = (PlanDonation.objects.filter(user=user, donation_date__gte=datetime.now())
+                              .order_by('date').first())
         donor_card.pop('token')
         data.update({
             "donor_card": donor_card,
