@@ -8,7 +8,17 @@ import { editUser } from "../api/user";
 import { useForm } from "react-hook-form";
 
 function EditProfile() {
-  const { register, handleSubmit } = useForm();
+  const { register, handleSubmit } = useForm({
+    defaultValues: {
+      email: null,
+      phone_number: null,
+      first_name: null,
+      last_name: null,
+      middle_name: null,
+      about: null,
+      birth_date: null,
+    },
+  });
   const navigate = useNavigate();
   const onSubmit = async (data) => {
     console.log(data);
@@ -72,15 +82,6 @@ function EditProfile() {
             id="phone"
             placeholder="Номер телефона"
             {...register("phone_number")}
-          />
-        </label>
-        <label htmlFor="username">
-          Ник
-          <input
-            type="text"
-            id="username"
-            placeholder="Имя пользователя"
-            {...register("username")}
           />
         </label>
         <label htmlFor="first_name">
