@@ -1,6 +1,6 @@
 import DonorButton from "../components/DonorButton";
 import { setUser } from "../localStorage";
-import { Link, useNavigate } from "react-router-dom";
+import { useNavigate } from "react-router-dom";
 import { ToastContainer, toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 import { AxiosError } from "axios";
