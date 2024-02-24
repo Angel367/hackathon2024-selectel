@@ -1,12 +1,14 @@
 import axios from "axios";
 export const editUser = async (user) => {
+  const userToken = localStorage.getItem("user").token;
+  console.log(userToken);
   return await axios.put(
     "https://donorsearchorg.ru/api/user/account/",
     {
       user: {
         email: user.email,
         username: user.username,
-        token: "token " + user.token,
+        token: "token " + userToken,
         phone_number: user.phone_number,
         first_name: user.first_name,
         last_name: user.last_name,
