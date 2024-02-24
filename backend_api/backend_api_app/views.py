@@ -388,12 +388,12 @@ class UserPlanDonationViewSet(viewsets.ViewSet):
 
     def list(self, request):
         """
-        Получить все плановые донорские записи пользователя.
+        Получить плановую донорскую запись пользователя.
         :param request:
         :return:
         """
-        donations = PlanDonation.objects.filter(user=request.user)
-        serializer = UserPlanDonationSerializer(donations, many=True)
+        donations = PlanDonation.objects.get(user_id=request.user.id)
+        serializer = UserPlanDonationSerializer(donations, many=False)
         return Response(serializer.data)
 
     def create(self, request):
@@ -402,6 +402,7 @@ class UserPlanDonationViewSet(viewsets.ViewSet):
         :param request:
         :return:
         """
+        PlanDonation.objects.filter(user=request.user).delete()
         user = request.user
         data = request.data.copy()
         data['user'] = user.id
