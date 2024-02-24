@@ -358,7 +358,9 @@ class UserDonationViewSet(viewsets.ViewSet):
             donation = Donation.objects.get(pk=pk)
         except Donation.DoesNotExist:
             return Response(status=status.HTTP_404_NOT_FOUND)
-
+        if "get" in request.data:
+            serializer = MyDonationSerializer(donation)
+            return Response(serializer.data)
         serializer = MyDonationSerializer(donation, data=data)
         if serializer.is_valid():
             serializer.save()

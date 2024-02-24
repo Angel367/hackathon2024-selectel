@@ -26,7 +26,7 @@ const DonationList = () => {
             {donations.map((donation, index) => (
             <div key={index} className="donation-card">
               <p>{donation.donation_date}</p>
-              <h4>{donation.blood_station.name}</h4>
+              <h4>{donation.blood_station.title}</h4>
                 <p>{donation.blood_station.address} </p>
               <p>{donation.donation_type} </p>
                 <p>{donation.is_free} </p>

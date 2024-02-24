@@ -23,10 +23,11 @@ export const readDonation = async (user, id_donation) => {
   const userToken = user.user.token;
   // console.log(userToken);
   return await axios.put(
-    `https://donorsearchorg.ru/api/user/donations/${id_donation}/`,
+    `http://localhost:8000/api/user/donations/${id_donation}/`,
     {
         token: "token " + userToken,
-        id: id_donation
+        id: id_donation,
+        get: true
 
     },
     {
