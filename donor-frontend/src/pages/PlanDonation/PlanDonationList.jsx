@@ -1,10 +1,9 @@
 import React, {useEffect, useState} from "react";
 import {readDonationList} from "../../api/donations.js";
-import {Link, useParams} from "react-router-dom";
 
 
-const DonationList = () => {
-  const {username} = useParams();
+const PlanDonationList = () => {
+
   const [donations, setDonations] = useState([]);
   const [is_confirmed, setConfirmed] = useState(false);
   const user = JSON.parse(localStorage.getItem("user"));
@@ -31,13 +30,10 @@ const DonationList = () => {
                 <p>{donation.blood_station.address} </p>
               <p>{donation.donation_type} </p>
                 <p>{donation.is_free} </p>
-                <p>{donation.is_confirmed} </p>//TODO: fix this
-              <Link to={`/users/${username}/donations/${donation.id}`}>
-                    <h4>Подробнее</h4>
-                </Link>
+                <p>{donation.is_confirmed} </p>
             </div>
                 ))}
             </div>
     );
 }
-export default DonationList;
+export default PlanDonationList;

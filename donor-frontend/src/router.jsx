@@ -13,6 +13,10 @@ import DonorCard from "./pages/DonorCard.jsx";
 import DonationList from "./pages/Donation/DonationList.jsx";
 import Donation from "./pages/Donation/Donation.jsx";
 import DonationCreate from "./pages/Donation/DonationCreate.jsx";
+import PlanDonationList from "./pages/PlanDonation/PlanDonationList.jsx";
+import PlanDonationCreate from "./pages/PlanDonation/PlanDonationCreate.jsx";
+import PlanDonation from "./pages/PlanDonation/PlanDonation.jsx";
+import SearchBloodStation from "./pages/SearchBloodStation.jsx";
 export const router = createBrowserRouter([
   {
     path: "/",
@@ -55,6 +59,30 @@ export const router = createBrowserRouter([
           </Protected>
         ),
       },
+        {
+        path: "/users/:username/plan-donations",
+        element: (
+          <Protected>
+            <PlanDonationList />
+          </Protected>
+        ),
+      },
+      {
+        path: "/users/:username/plan-donations/:id/create",
+        element: (
+          <Protected>
+            <PlanDonationCreate />
+          </Protected>
+        ),
+      },
+      {
+        path: "/users/:username/plan-donations/:id",
+        element: (
+          <Protected>
+            <PlanDonation />
+          </Protected>
+        ),
+      },
       {
         path: "/register",
         element: <Register />,
@@ -62,6 +90,10 @@ export const router = createBrowserRouter([
       {
         path: "/login",
         element: <Login />,
+      },
+        {
+        path: "/blood_centers",
+        element: <SearchBloodStation />,
       },
       {
         path: "/top",

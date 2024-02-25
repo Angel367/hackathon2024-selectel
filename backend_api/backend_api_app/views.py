@@ -358,7 +358,9 @@ class UserDonationViewSet(viewsets.ViewSet):
             donation = Donation.objects.get(pk=pk)
         except Donation.DoesNotExist:
             return Response(status=status.HTTP_404_NOT_FOUND)
-
+        if "get" in request.data:
+            serializer = MyDonationSerializer(donation)
+            return Response(serializer.data)
         serializer = MyDonationSerializer(donation, data=data)
         if serializer.is_valid():
             serializer.save()
@@ -636,6 +638,7 @@ class BloodStationSearchViewSet(viewsets.ViewSet):
         :param request:
         :return:
         """
+        city = request.query_params.get('city', None)
         search_text = request.query_params.get('search_text', None)
         is_work_on_saturday = request.query_params.get('is_work_on_saturday', None)
         is_work_on_sunday = request.query_params.get('is_work_on_sunday', None)
@@ -648,10 +651,12 @@ class BloodStationSearchViewSet(viewsets.ViewSet):
             blood_station = BloodStation.objects.get(id=id)
             blood_station_serializer = BloodStationSerializer(blood_station)
             return Response(blood_station_serializer.data)
-        if blood_type:
-            bss = BloodStation.objects.filter(Q(**{blood_type: "need"}) | Q(**{blood_type: "unknown"}))
+        if city:
+            bss = BloodStation.objects.filter(city=city)
         else:
             bss = BloodStation.objects.all()
+        if blood_type:
+            bss = bss.filter(Q(**{blood_type: "need"}) | Q(**{blood_type: "unknown"}))
         if search_text is None:
             search_text = ""
         bs_titles = []

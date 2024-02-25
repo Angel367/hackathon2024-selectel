@@ -379,9 +379,9 @@ class MyDonationSerializer(serializers.ModelSerializer):
             representation['blood_station'] = BloodStationSerializer(instance.blood_station).data
         return representation
 
-    class Meta:
-        model = Donation
-        fields = ['token', 'donation_date', 'blood_station', 'donation_type']
+    # class Meta:
+    #     model = Donation
+    #     # fields = ['token', 'donation_date', 'blood_station', 'donation_type']
 
     class Meta:
         """
@@ -389,6 +389,7 @@ class MyDonationSerializer(serializers.ModelSerializer):
         """
         model = Donation
         fields = '__all__'  # This will include all fields from the Donation model
+        read_only_fields = ['token']
 
 
 class UserPlanDonationSerializer(serializers.ModelSerializer):
@@ -421,9 +422,9 @@ class UserPlanDonationSerializer(serializers.ModelSerializer):
             representation['blood_station'] = BloodStationSerializer(instance.blood_station).data
         return representation
 
-    class Meta:
-        model = PlanDonation
-        fields = '__all__'
+    # class Meta:
+    #     model = PlanDonation
+    #     fields = '__all__'
 
     class Meta:
         """
