@@ -263,7 +263,6 @@ class DonationForTopSerializer(serializers.ModelSerializer):
         """
         model = Donation
         fields = '__all__'  # This will include all fields from the Donation model
-        depth = 4
 
 
 class BonusFeedbackSerializer(serializers.ModelSerializer):
