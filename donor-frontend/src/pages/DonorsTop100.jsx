@@ -38,8 +38,6 @@ const DonorsTop100 = () => {
       .then((response) => {
         setDonors(response.data);
         setLoading(false);
-        console.log(setDonors);
-        console.log(loading);
       })
       .catch((error) => console.error(error));
   };

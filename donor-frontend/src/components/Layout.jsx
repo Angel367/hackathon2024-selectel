@@ -16,9 +16,14 @@ function Layout() {
       </main>
       <div className="footer">
         {user && (
-          <Link to={`/users/${user.user.username}`}>
-            <img src="/user.svg" width={40} height={40} />
-          </Link>
+          <>
+            <Link to={`/users/${user.user.username}/donations/create`}>
+              <img src="/add_donation.svg" width={40} height={40} />
+            </Link>
+            <Link to={`/users/${user.user.username}`}>
+              <img src="/user.svg" width={40} height={40} />
+            </Link>
+          </>
         )}
         <Link to="/menu">
           <img src="/menu.svg" width={40} height={40} />

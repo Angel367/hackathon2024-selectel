@@ -49,7 +49,14 @@ export default function Profile() {
       >
         <img src="/logout.svg" width={50} height={50} />
       </button>
-      <Link to="/edit">Редактировать профиль</Link>
+
+      <Link to={`/users/${user.user.username}/donations`}>
+        <img src="/simple_drops.svg" />
+        <h3>Донации пользователя</h3>
+      </Link>
+      <Link to="/edit">
+        <DonorButton text="Редактировать профиль" />
+      </Link>
     </div>
   );
 }

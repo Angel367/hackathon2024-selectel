@@ -198,7 +198,7 @@ input[type="radio"] {
 }
 
 .donor-card {
-  background-color: --tg-theme-secondary-bg-color;
+  background-color: var(--tg-theme-secondary-bg-color);
   border-radius: 10px;
   box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
   padding: 15px 20px;
@@ -254,4 +254,22 @@ p {
 
 h2 {
   text-align: center;
+}
+
+.donation_grid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  background-color: var(--tg-theme-bg-color);
+  gap: 1rem;
+}
+
+.donation_card {
+  background-color: var(--tg-theme-secondary-bg-color);
+  color: var(--tg-theme-button-text-color);
+  margin: 0 auto;
+  width: 180px;
+  padding: 12px 20px;
+  border: 1px solid var(--tg-theme-secondary-bg-color);
+  border-radius: 0.4rem;
+  box-shadow: rgba(0, 0, 0, 0.35) 0px 5px 15px;
 }
