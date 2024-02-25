@@ -1,6 +1,4 @@
 import React, { useState, useEffect } from "react";
-import DonorButton from "../components/DonorButton.jsx";
-import { Link } from "react-router-dom";
 import axios from "axios";
 
 const tg = window.Telegram.WebApp;
@@ -54,7 +52,7 @@ const DonorsTop100 = () => {
     <>
       <h1>Топ 100 доноров</h1>
       {loading ? (
-        <h3>Loading...</h3>
+        <h2>Loading...</h2>
       ) : (
         <div className="container">
           <div className="donor-list">

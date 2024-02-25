@@ -251,3 +251,7 @@ p {
 .readyToDonateItem__name {
   color: var(--tg-theme-button-text-color);
 }
+
+h2 {
+  text-align: center;
+}
