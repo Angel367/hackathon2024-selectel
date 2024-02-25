@@ -5,8 +5,7 @@ export const readPlanDonationList = async (user) => {
   return await axios.get(
     "https://donorsearchorg.ru/api/user/plan_donations/",
     {
-        token: "token " + userToken,
-
+      token: "token " + userToken,
     },
     {
       headers: {
@@ -14,7 +13,7 @@ export const readPlanDonationList = async (user) => {
       },
     }
   );
-}
+};
 
 export const readPlanDonation = async (user, id_plan_donation) => {
   const userToken = localStorage.getItem("user").token;
@@ -22,8 +21,7 @@ export const readPlanDonation = async (user, id_plan_donation) => {
   return await axios.put(
     `https://donorsearchorg.ru/api/user/plan_donations/${id_plan_donation}/`,
     {
-        token: "token " + userToken,
-
+      token: "token " + userToken,
     },
     {
       headers: {
@@ -31,18 +29,22 @@ export const readPlanDonation = async (user, id_plan_donation) => {
       },
     }
   );
-}
-export const updatePlanDonation = async (user, id_plan_donation, plan_donation) => {
+};
+export const updatePlanDonation = async (
+  user,
+  id_plan_donation,
+  plan_donation
+) => {
   const userToken = localStorage.getItem("user").token;
   console.log(userToken);
   return await axios.put(
     `https://donorsearchorg.ru/api/user/plan_donations/${id_plan_donation}/`,
     {
-        token: "token " + userToken,
-        donation_date: plan_donation.donation_date,
-        blood_station_id:plan_donation.blood_station_id,
-        donation_type: plan_donation.donation_type,
-        is_free: plan_donation.is_free,
+      token: "token " + userToken,
+      donation_date: plan_donation.donation_date,
+      blood_station_id: plan_donation.blood_station_id,
+      donation_type: plan_donation.donation_type,
+      is_free: plan_donation.is_free,
     },
     {
       headers: {
@@ -50,7 +52,7 @@ export const updatePlanDonation = async (user, id_plan_donation, plan_donation) 
       },
     }
   );
-}
+};
 
 export const createPlanDonation = async (user, plan_donation) => {
   const userToken = localStorage.getItem("user").token;
@@ -58,11 +60,11 @@ export const createPlanDonation = async (user, plan_donation) => {
   return await axios.post(
     "https://donorsearchorg.ru/api/user/plan_donations/",
     {
-        token: "token " + userToken,
-        donation_date: plan_donation.donation_date,
-        blood_station_id:plan_donation.blood_station_id,
-        donation_type: plan_donation.donation_type,
-        is_free: plan_donation.is_free,
+      token: "token " + userToken,
+      donation_date: plan_donation.donation_date,
+      blood_station_id: plan_donation.blood_station_id,
+      donation_type: plan_donation.donation_type,
+      is_free: plan_donation.is_free,
     },
     {
       headers: {
@@ -70,7 +72,7 @@ export const createPlanDonation = async (user, plan_donation) => {
       },
     }
   );
-}
+};
 
 export const deletePlanDonation = async (user, id_plan_donation) => {
   const userToken = localStorage.getItem("user").token;
@@ -78,7 +80,7 @@ export const deletePlanDonation = async (user, id_plan_donation) => {
   return await axios.put(
     `https://donorsearchorg.ru/api/user/donations/${id_plan_donation}/`,
     {
-        token: "token " + userToken
+      token: "token " + userToken,
     },
     {
       headers: {
@@ -86,4 +88,4 @@ export const deletePlanDonation = async (user, id_plan_donation) => {
       },
     }
   );
-}
+};

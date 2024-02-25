@@ -36,7 +36,7 @@ export const editUser = async (user) => {
 };
 export const editUserDonorCard = async (user) => {
   const userToken = JSON.parse(localStorage.getItem("user")).user.token;
-  console.log(userToken);
+
   return await axios.put(
     "https://donorsearchorg.ru/api/user/donor-card/",
     {

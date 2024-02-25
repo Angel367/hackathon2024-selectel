@@ -40,6 +40,8 @@ const DonorsTop100 = () => {
       .then((response) => {
         setDonors(response.data);
         setLoading(false);
+        console.log(setDonors);
+        console.log(loading);
       })
       .catch((error) => console.error(error));
   };
@@ -51,30 +53,34 @@ const DonorsTop100 = () => {
   return (
     <>
       <h1>Топ 100 доноров</h1>
-      <div className="container">
-        <div className="donor-list">
-          {donors.map((donor, index) => (
-            <div key={index} className="donor-card">
-              <h3>{donor.name_to_display}</h3>
-              <p>{donor.value_to_display}</p>
-              <p>{donor.total_amount} </p>
-              <br></br>
-              <MySVG
-                fillColor={
-                  index === 0
-                    ? "#F9DA62"
-                    : index === 1
-                    ? "#A6B3CE"
-                    : index === 2
-                    ? "#ED9564"
-                    : "#F4F5F6"
-                }
-                digit={(index + 1).toString()} // Convert index to string before passing
-              />
-            </div>
-          ))}
+      {loading ? (
+        <h3>Loading...</h3>
+      ) : (
+        <div className="container">
+          <div className="donor-list">
+            {donors.map((donor, index) => (
+              <div key={index} className="donor-card">
+                <h3>{donor.name_to_display}</h3>
+                <p>{donor.value_to_display}</p>
+                <p>{donor.total_amount} </p>
+                <br></br>
+                <MySVG
+                  fillColor={
+                    index === 0
+                      ? "#F9DA62"
+                      : index === 1
+                      ? "#A6B3CE"
+                      : index === 2
+                      ? "#ED9564"
+                      : "#F4F5F6"
+                  }
+                  digit={(index + 1).toString()} // Convert index to string before passing
+                />
+              </div>
+            ))}
+          </div>
         </div>
-      </div>
+      )}
     </>
   );
 };
